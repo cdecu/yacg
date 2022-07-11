@@ -1,6 +1,7 @@
-import { Config } from "./config";
-import { logHelper, ModelInfo, modelInfo, modelPrintor, TSPrintor } from "@yacg/core";
 import * as YAML from "yaml";
+import { Config } from "./config";
+import { AmiModel, intfModelPrintor, logHelper, TSPrintor } from "@yacg/core";
+import { PascalPrintor } from "../../../../libs/core/src/lib/pascal/pascalPrintor";
 
 /**
  * Parse a YAML,JSON string into a AMI
@@ -8,11 +9,11 @@ import * as YAML from "yaml";
 export class Parser {
   private src?: any;
   private trg?: any;
-  private readonly ami: modelInfo;
-  private readonly printor: modelPrintor;
+  private readonly ami: AmiModel;
+  private readonly printor: intfModelPrintor<AmiModel>;
 
   constructor(private config: Config, private cliLogger: logHelper) {
-    this.ami = new ModelInfo();
+    this.ami = new AmiModel();
     this.printor = this.createPrintor();
   }
 
@@ -35,13 +36,12 @@ export class Parser {
     console.log(this.trg);
   }
 
-  private createPrintor(): modelPrintor {
+  private createPrintor(): intfModelPrintor<AmiModel> {
     switch (this.config.language) {
       case "pascal":
-        return new TSPrintor({});
-      // this.printor = new PascalPrintor({});
+        return new PascalPrintor(this.ami, this.config);
       default:
-        return new TSPrintor({});
+        return new TSPrintor(this.ami, this.config);
     }
   }
 }

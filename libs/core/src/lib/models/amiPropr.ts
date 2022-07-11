@@ -1,12 +1,15 @@
-import {intfObjInfo, isPrimitive, modelInfo, propertyInfo, propertyType, valType} from "./intfs";
+import { isPrimitive, valType } from "./amiUtils";
+import { intfModel } from "./intfModel";
+import { intfPropr, propertyType } from "./intfPropr";
+import { intfObjInfo } from "./intfObj";
 
 /**
  * Object Property Abstract Info
  */
-export class PropertyInfo implements propertyInfo {
+export class AmiPropr<AMI> implements intfPropr<AMI> {
   public type = propertyType.otUnknown;
-  public subType!: PropertyInfo;
-  public description = '';
+  public subType!: intfPropr<AMI>;
+  public description = "";
   public required = true;
   public sampleTypes = new Set<propertyType>([]);
   public sampleValues = new Set<any>([]);
@@ -16,7 +19,7 @@ export class PropertyInfo implements propertyInfo {
    * Just initialize name.
    * TODO I dont like to pass the logger everywhere but ...
    */
-  constructor(public readonly name: string) {}
+  constructor(public readonly ami: intfModel<AMI>, public readonly name: string) {}
 
   /**
    * Is Simple Type
@@ -39,9 +42,9 @@ export class PropertyInfo implements propertyInfo {
   /**
    * Add a Sample value the property. Detect the typeof
    * @param val
-   * @returns {propertyInfo}
+   * @returns {intfPropr}
    */
-  addSampleVal(val: any): propertyInfo {
+  addSampleVal(val: any): intfPropr<AMI> {
     const vt = valType(val);
     this.type ||= vt;
     this.sampleSize += 1;
@@ -53,15 +56,15 @@ export class PropertyInfo implements propertyInfo {
   /**
    * Detect type from sample values
    */
-  public detectType(model: modelInfo, owner: intfObjInfo) {
+  public detectType(model: intfModel<AMI>, owner: intfObjInfo<AMI>) {
     //  Build description
     if (this.sampleValues.size > 0) {
       const examples = Array.from(this.sampleValues)
-      .map((v) => JSON.stringify(v))
-      .filter((v) => v != '""')
-      .join(';');
+        .map((v) => JSON.stringify(v))
+        .filter((v) => v != '""')
+        .join(";");
       if (examples) {
-        this.description += '@example ' + examples;
+        this.description += "@example " + examples;
       }
     }
 
@@ -90,8 +93,8 @@ export class PropertyInfo implements propertyInfo {
     }
 
     // Property is a Map  {}
-    if (this.sampleTypes.size === 1 && this.type === propertyType.otMap && model.addChildObject) {
-      const o = model.addChildObject(this);
+    if (this.sampleTypes.size === 1 && this.type === propertyType.otMap && model.addPropr) {
+      const o = model.addPropr(this);
       o.sampleSize = this.sampleTypes.size;
       this.sampleValues.forEach((v: any) => {
         Object.entries(v).forEach(([key, val]) => {
@@ -107,29 +110,11 @@ export class PropertyInfo implements propertyInfo {
   }
 
   /**
-   * Try to find enum ex: CardColor : SPADE, HEART, DIAMOND, CLUB.
-   * So type is converted to an Enum or a Type Alias.
-   * @private
-   */
-  private detectEnumType(model: modelInfo, owner: intfObjInfo) {
-    // this.logger?.log(`EnumType ${model.name}.${owner.name}.${this.name}`);
-  }
-
-  /**
-   * Try to find union type like number | string
-   * So type is converted to a Type Alias.
-   * @private
-   */
-  private detectUnionType(model: modelInfo, owner: intfObjInfo) {
-    // this.logger?.log(`UnionType ${model.name}.${owner.name}.${this.name}`);
-  }
-
-  /**
    * Extract list items type(s) from sampleValues
-   * @param {modelInfo} model
+   * @param {intfModel} model
    * @param {intfObjInfo} owner
    */
-  public detectListSubType(model: modelInfo, owner: intfObjInfo) {
+  public detectListSubType(model: intfModel<AMI>, owner: intfObjInfo<AMI>) {
     // Build itemTypes Set
     const itemTypes = new Set<propertyType>([]);
     this.sampleValues.forEach((v: any[]) => v.forEach((i: any) => itemTypes.add(valType(i))));
@@ -139,12 +124,30 @@ export class PropertyInfo implements propertyInfo {
     itemTypes.forEach((vt) => (cntCplex += isPrimitive(vt) ? 0 : 1));
     if (!cntCplex) {
       // Only Primitive types
-      this.subType = new PropertyInfo(this.name + '.item');
+      this.subType = new AmiPropr(this.ami, this.name + ".item");
       this.sampleValues.forEach((v: any[]) => v.forEach((i: any) => this.subType.addSampleVal(i)));
       return;
     }
     // List of Object ?
     // this.logger?.log(`List ${model.name}.${owner.name}.${this.name} SubType`);
-    this.subType = new PropertyInfo(this.name + '.item');
+    this.subType = new AmiPropr(this.ami, this.name + ".item");
+  }
+
+  /**
+   * Try to find enum ex: CardColor : SPADE, HEART, DIAMOND, CLUB.
+   * So type is converted to an Enum or a Type Alias.
+   * @private
+   */
+  private detectEnumType(model: intfModel<AMI>, owner: intfObjInfo<AMI>) {
+    // this.logger?.log(`EnumType ${model.name}.${owner.name}.${this.name}`);
+  }
+
+  /**
+   * Try to find union type like number | string
+   * So type is converted to a Type Alias.
+   * @private
+   */
+  private detectUnionType(model: intfModel<AMI>, owner: intfObjInfo<AMI>) {
+    // this.logger?.log(`UnionType ${model.name}.${owner.name}.${this.name}`);
   }
 }

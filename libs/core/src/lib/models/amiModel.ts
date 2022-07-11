@@ -1,19 +1,22 @@
-import {modelInfo, propertyInfo} from '@yacg/core';
-import {IntfObjInfo} from './intfInfo';
+import { intfObjInfo } from "./intfObj";
+import { AmiObj } from "./amiObj";
+import { intfPropr } from "./intfPropr";
 
 /**
  * Abstract Model Info
  */
-export class ModelInfo implements modelInfo {
-  public readonly rootIntf: IntfObjInfo;
-  public readonly childIntfs: IntfObjInfo[] = [];
+export class AmiModel {
+  public readonly ami: AmiModel;
+  public readonly rootIntf: intfObjInfo<AmiModel>;
+  public readonly childIntfs: intfObjInfo<AmiModel>[] = [];
   public sampleSize = 0;
 
   /**
    * Abstract Model Info constructor
    */
-  constructor(public name = 'MyIntf', public description = '') {
-    this.rootIntf = new IntfObjInfo(name, description);
+  constructor(public name = "MyIntf", public description = "") {
+    this.ami = this;
+    this.rootIntf = new AmiObj(this.ami, name, description);
   }
 
   /**
@@ -40,12 +43,12 @@ export class ModelInfo implements modelInfo {
       // this.logger?.log(`load Sample Array of ${json.length}`);
       this.sampleSize = json.length;
       this.rootIntf.sampleSize = this.sampleSize;
-      if (!this.sampleSize) throw 'Empty Array';
+      if (!this.sampleSize) throw "Empty Array";
       json.forEach((i) => this.parseJSON(i));
       this.rootIntf.detectTypes(this);
       return;
     }
-    if (typeof json === 'object') {
+    if (typeof json === "object") {
       // this.logger?.log('load Sample');
       this.rootIntf.sampleSize = 1;
       this.sampleSize = 1;
@@ -53,7 +56,7 @@ export class ModelInfo implements modelInfo {
       this.rootIntf.detectTypes(this);
       return;
     }
-    throw 'Unsupported JSON';
+    throw "Unsupported JSON";
   }
 
   /**
@@ -66,11 +69,11 @@ export class ModelInfo implements modelInfo {
 
   /**
    * add Child Object needed by subtype
-   * @returns {IntfObjInfo}
+   * @returns {AmiObj}
    * @param prop
    */
-  public addChildObject(prop: propertyInfo): IntfObjInfo {
-    const childObject = new IntfObjInfo(`${this.rootIntf.name}.${prop.name}`, prop.description);
+  public addPropr(prop: intfPropr<AmiModel>): intfObjInfo<AmiModel> {
+    const childObject = new AmiObj<AmiModel>(this.ami, `${this.rootIntf.name}.${prop.name}`, prop.description);
     this.childIntfs.push(childObject);
     return childObject;
   }

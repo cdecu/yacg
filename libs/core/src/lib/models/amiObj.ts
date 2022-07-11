@@ -1,18 +1,18 @@
-import { PropertyInfo } from './propInfo';
-import {intfObjInfo, modelInfo, propertyInfo} from '@yacg/core';
+import { AmiPropr } from "./amiPropr";
+import { intfModel, intfObjInfo, intfPropr } from "@yacg/core";
 
 /**
  * Object Abstract Info
  * an Object is (for us) just a list of properties
  */
-export class IntfObjInfo implements intfObjInfo {
-  public properties: PropertyInfo[] = [];
+export class AmiObj<AMI> implements intfObjInfo<AMI> {
+  public properties: AmiPropr<AMI>[] = [];
   public sampleSize = 0;
 
   /**
    * Just initialize name,type
    */
-  constructor(public name: string,public description: string='') {}
+  constructor(public readonly ami: intfModel<AMI>, public name: string, public description: string = "") {}
 
   /**
    * Clear
@@ -29,13 +29,13 @@ export class IntfObjInfo implements intfObjInfo {
    * @param key
    * @param val
    */
-  public addSampleProperty(key: string, val: unknown): propertyInfo {
+  public addSampleProperty(key: string, val: unknown): intfPropr<AMI> {
     const found = this.properties.find((i) => i.name === key);
     if (found) {
       found.addSampleVal(val);
       return found;
     }
-    const newOne = new PropertyInfo(key);
+    const newOne = new AmiPropr<AMI>(this.ami, key);
     this.properties.push(newOne);
     newOne.addSampleVal(val);
     return newOne;
@@ -44,7 +44,7 @@ export class IntfObjInfo implements intfObjInfo {
   /**
    * Detect properties type from sample values
    */
-  public detectTypes(model: modelInfo) {
+  public detectTypes(model: intfModel<AMI>) {
     this.properties.forEach((prop) => prop.detectType(model, this));
   }
 }

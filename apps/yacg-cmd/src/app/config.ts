@@ -6,11 +6,11 @@ import { cosmiconfigSync } from "cosmiconfig";
  * singleton class
  */
 export class Config {
-  private readonly config: any;
   public readonly file: string;
   public readonly intfName: string;
   public readonly intfDescr: string;
   public readonly language: string;
+  private readonly config: any;
 
   constructor() {
     // load cmd args
@@ -30,31 +30,6 @@ export class Config {
     this.intfName = this.config.output.intfName;
     this.intfDescr = this.config.output.intfDescr;
     this.file = this.config.file || "-";
-  }
-
-  private static yargs() {
-    const cmdline = yargs
-      .env("YACG")
-      .wrap(yargs.terminalWidth())
-      .scriptName("yacg-cmd")
-      .usage("$0 <cmd> [args]")
-      .version()
-      .alias("v", "version")
-      .options({
-        configFile: {
-          alias: "c",
-          describe: "Configuration file (.yacgrc.json)",
-        },
-        file: {
-          alias: "f",
-          describe: "Source file (- for stdin)",
-        },
-      });
-
-    cmdline.parse();
-    cmdline.showHelp().exitProcess(false).epilog("copyright 2022");
-
-    return cmdline.argv;
   }
 
   static readJsonFromStdin(): Promise<string> {
@@ -80,5 +55,30 @@ export class Config {
         reject(Error("timout during read"));
       });
     });
+  }
+
+  private static yargs() {
+    const cmdline = yargs
+      .env("YACG")
+      .wrap(yargs.terminalWidth())
+      .scriptName("yacg-cmd")
+      .usage("$0 <cmd> [args]")
+      .version()
+      .alias("v", "version")
+      .options({
+        configFile: {
+          alias: "c",
+          describe: "Configuration file (.yacgrc.json)",
+        },
+        file: {
+          alias: "f",
+          describe: "Source file (- for stdin)",
+        },
+      });
+
+    cmdline.parse();
+    cmdline.showHelp().exitProcess(false).epilog("copyright 2022");
+
+    return cmdline.argv;
   }
 }
