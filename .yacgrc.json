@@ -1,0 +1,11 @@
+{
+  "test": "toto",
+  "albert": "son pere",
+  "x-file": "test.json",
+  "file": "test.yaml",
+  "output": {
+    "language": "pascal",
+    "intfName" : "MyInterface",
+    "intfDescr" : "Intf Descr"
+  }
+}
