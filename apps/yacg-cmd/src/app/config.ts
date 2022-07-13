@@ -1,5 +1,6 @@
 import * as yargs from "yargs";
 import { cosmiconfigSync } from "cosmiconfig";
+import { LogLevel } from "@yacg/core";
 
 /**
  * configuration class. Config is loaded from argv and/or configFile
@@ -10,6 +11,7 @@ export class Config {
   public readonly intfName: string;
   public readonly intfDescr: string;
   public readonly language: string;
+  public readonly logLevel: LogLevel;
   private readonly config: any;
 
   constructor() {
@@ -22,14 +24,15 @@ export class Config {
     // merge config file and argv
     this.config = { ...config, ...argv };
     this.config.configFile = configFile || filepath;
-    this.config.output ||= {};
-    this.config.output.language ||= "pascal";
-    this.config.output.intfName ||= "IMyInterface";
-    this.config.output.intfDescr ||= "Intf Descr";
-    this.language = this.config.output.language;
-    this.intfName = this.config.output.intfName;
-    this.intfDescr = this.config.output.intfDescr;
-    this.file = this.config.file || "-";
+    this.config.language ||= "pascal";
+    this.language = this.config.language;
+    this.config.intfName ||= "IMyInterface";
+    this.intfName = this.config.intfName;
+    this.config.intfDescr ||= "Intf Descr";
+    this.intfDescr = this.config.intfDescr;
+    this.config.file = this.config.file || "-";
+    this.file = this.config.file;
+    this.logLevel = LogLevel.Debug;
   }
 
   static readJsonFromStdin(): Promise<string> {
@@ -70,14 +73,19 @@ export class Config {
           alias: "c",
           describe: "Configuration file (.yacgrc.json)",
         },
+        language: {
+          alias: "l",
+          describe: "Output language (Pascal, Typescript,...)",
+        },
         file: {
           alias: "f",
           describe: "Source file (- for stdin)",
         },
-      });
+      })
+      .help(true);
 
     cmdline.parse();
-    cmdline.showHelp().exitProcess(false).epilog("copyright 2022");
+    cmdline.exitProcess(false).epilog("copyright 2022");
 
     return cmdline.argv;
   }

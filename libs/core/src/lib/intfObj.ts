@@ -17,7 +17,7 @@ export interface intfObjInfo<AMI> {
   /**
    * Detect properties type from sample values
    */
-  detectTypes: (model: intfModel<AMI>) => void;
+  detectTypes: () => void;
 
   /**
    * Initialize and clear properties

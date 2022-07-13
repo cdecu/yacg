@@ -8,7 +8,7 @@ import { intfObjInfo } from "./intfObj";
  */
 export class AmiPropr<AMI> implements intfPropr<AMI> {
   public type = propertyType.otUnknown;
-  public subType!: intfPropr<AMI>;
+  public itemsType!: intfPropr<AMI>;
   public description = "";
   public required = true;
   public sampleTypes = new Set<propertyType>([]);
@@ -19,7 +19,7 @@ export class AmiPropr<AMI> implements intfPropr<AMI> {
    * Just initialize name.
    * TODO I dont like to pass the logger everywhere but ...
    */
-  constructor(public readonly ami: intfModel<AMI>, public readonly name: string) {}
+  constructor(public readonly ami: intfModel<AMI>, public readonly owner: intfObjInfo<AMI>, public readonly name: string) {}
 
   /**
    * Is Simple Type
@@ -56,7 +56,7 @@ export class AmiPropr<AMI> implements intfPropr<AMI> {
   /**
    * Detect type from sample values
    */
-  public detectType(model: intfModel<AMI>, owner: intfObjInfo<AMI>) {
+  public detectType() {
     //  Build description
     if (this.sampleValues.size > 0) {
       const examples = Array.from(this.sampleValues)
@@ -69,7 +69,7 @@ export class AmiPropr<AMI> implements intfPropr<AMI> {
     }
 
     // Required if always present
-    this.required = model.sampleSize === this.sampleSize;
+    this.required = this.ami.sampleSize === this.sampleSize;
 
     // Count complex types (not primitive)
     let cntCplex = 0;
@@ -78,9 +78,9 @@ export class AmiPropr<AMI> implements intfPropr<AMI> {
     // Property is a Primitive type(s)
     if (!cntCplex) {
       if (this.sampleTypes.size === 1) {
-        this.detectEnumType(model, owner);
+        this.detectEnumType();
       } else {
-        this.detectUnionType(model, owner);
+        this.detectUnionType();
       }
       return;
     }
@@ -88,33 +88,41 @@ export class AmiPropr<AMI> implements intfPropr<AMI> {
     // Property is a List
     if (this.sampleTypes.size === 1 && this.type === propertyType.otList) {
       // need to detect list elements type
-      this.detectListSubType(model, owner);
+      this.detectListSubType();
       return;
     }
 
     // Property is a Map  {}
-    if (this.sampleTypes.size === 1 && this.type === propertyType.otMap && model.addPropr) {
-      const o = model.addPropr(this);
+    if (this.sampleTypes.size === 1 && this.type === propertyType.otMap && this.ami.addPropr) {
+      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>");
+      const o = this.ami.addPropr(this);
+      console.log(o.name);
       o.sampleSize = this.sampleTypes.size;
       this.sampleValues.forEach((v: any) => {
-        Object.entries(v).forEach(([key, val]) => {
-          o.addSampleProperty(key, val);
-        });
+        if (v !== undefined && v !== null) {
+          Object.entries(v).forEach(([key, val]) => {
+            o.addSampleProperty(key, val);
+          });
+        }
       });
-      o.detectTypes(model);
+      o.detectTypes();
+      // this.type  = o.typeName;
+      return;
+    }
+
+    // Property is a null
+    if (this.sampleTypes.size === 1 && this.type === propertyType.otUnknown) {
       return;
     }
 
     // NO yet handled
-    throw `Unsupported type ${model.name}.${owner.name}.${this.name}`;
+    throw `Unsupported type ${this.ami.name}.${this.owner.name}.${this.name}`;
   }
 
   /**
    * Extract list items type(s) from sampleValues
-   * @param {intfModel} model
-   * @param {intfObjInfo} owner
    */
-  public detectListSubType(model: intfModel<AMI>, owner: intfObjInfo<AMI>) {
+  public detectListSubType() {
     // Build itemTypes Set
     const itemTypes = new Set<propertyType>([]);
     this.sampleValues.forEach((v: any[]) => v.forEach((i: any) => itemTypes.add(valType(i))));
@@ -124,13 +132,13 @@ export class AmiPropr<AMI> implements intfPropr<AMI> {
     itemTypes.forEach((vt) => (cntCplex += isPrimitive(vt) ? 0 : 1));
     if (!cntCplex) {
       // Only Primitive types
-      this.subType = new AmiPropr(this.ami, this.name + ".item");
-      this.sampleValues.forEach((v: any[]) => v.forEach((i: any) => this.subType.addSampleVal(i)));
+      this.itemsType = new AmiPropr(this.ami, this.owner, this.name + ".item");
+      this.sampleValues.forEach((v: any[]) => v.forEach((i: any) => this.itemsType.addSampleVal(i)));
       return;
     }
     // List of Object ?
-    // this.logger?.log(`List ${model.name}.${owner.name}.${this.name} SubType`);
-    this.subType = new AmiPropr(this.ami, this.name + ".item");
+    // this.logger?.log(`List ${model.name}.${owner.name}.${this.name} items type`);
+    this.itemsType = new AmiPropr(this.ami, this.owner, this.name + ".item");
   }
 
   /**
@@ -138,8 +146,8 @@ export class AmiPropr<AMI> implements intfPropr<AMI> {
    * So type is converted to an Enum or a Type Alias.
    * @private
    */
-  private detectEnumType(model: intfModel<AMI>, owner: intfObjInfo<AMI>) {
-    // this.logger?.log(`EnumType ${model.name}.${owner.name}.${this.name}`);
+  private detectEnumType() {
+    console.log(`EnumType ${this.ami.name}.${this.owner.name}.${this.name}`);
   }
 
   /**
@@ -147,7 +155,7 @@ export class AmiPropr<AMI> implements intfPropr<AMI> {
    * So type is converted to a Type Alias.
    * @private
    */
-  private detectUnionType(model: intfModel<AMI>, owner: intfObjInfo<AMI>) {
-    // this.logger?.log(`UnionType ${model.name}.${owner.name}.${this.name}`);
+  private detectUnionType() {
+    console.log(`UnionType ${this.ami.name}.${this.owner.name}.${this.name}`);
   }
 }

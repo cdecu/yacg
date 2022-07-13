@@ -1,4 +1,4 @@
-import { propertyType } from "@yacg/core";
+import { propertyType } from "./intfPropr";
 
 /**
  * Find the `value` type
@@ -6,8 +6,13 @@ import { propertyType } from "@yacg/core";
  * @returns {propertyType}
  */
 export function valType(value: any): propertyType {
+  // catch null and undefined
+  if (value == null) return propertyType.otUnknown;
+
+  // catch arrays
   if (Array.isArray(value)) return propertyType.otList;
 
+  // catch simple types
   const type = typeof value;
   if (type === "boolean") return propertyType.otBoolean;
   if (type === "bigint") return propertyType.otBigInt;

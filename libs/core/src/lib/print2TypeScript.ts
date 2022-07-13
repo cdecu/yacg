@@ -1,14 +1,32 @@
 import * as Handlebars from "handlebars";
-import { intfModelPrintor } from "../models/intfPrintor";
-import { intfModel } from "../models/intfModel";
-import { intfPropr, propertyType } from "../models/intfPropr";
-import { intfObjInfo } from "../models/intfObj";
-import { convertTSIntfName, convertTSPropertyName } from "./tsUtils";
+import { intfModelPrintor } from "./intfPrintor";
+import { intfModel } from "./intfModel";
+import { intfPropr, propertyType } from "./intfPropr";
+import { intfObjInfo } from "./intfObj";
+
+/**
+ * Convert `value` to a valid TS Interface Name
+ * @param {string} value
+ * @returns {string}
+ */
+export function convertTSIntfName(value: string): string {
+  const intfName = value.replaceAll(/[." -]/g, "_");
+  return intfName.replaceAll(/___|__/g, "_");
+}
+/**
+ * Convert `value` to a valid TS Property Name
+ * @param {string} value
+ * @returns {string}
+ */
+export function convertTSPropertyName(value: string): string {
+  const intfName = value.replaceAll(/[." -]/g, "_");
+  return intfName.replaceAll(/___|__/g, "_");
+}
 
 /**
  * Print to typescript.
  */
-export class TSPrintor<AMI> implements intfModelPrintor<AMI> {
+export class Print2TypeScript<AMI> implements intfModelPrintor<AMI> {
   /**
    * Typescript Interface
    * TODO Should use precompiled Handlebars Templates !
@@ -44,9 +62,9 @@ export interface {{name}} {
    */
   constructor(public readonly ami: intfModel<AMI>, public readonly config: any) {
     // add custom helpers to Handlebars
-    Handlebars.registerHelper("JDocDescr", (indent: number, val: string) => TSPrintor.JDocDescr(indent, val));
+    Handlebars.registerHelper("JDocDescr", (indent: number, val: string) => Print2TypeScript.JDocDescr(indent, val));
     Handlebars.registerHelper("Indent", (indent: number) => " ".repeat(indent));
-    Handlebars.registerHelper("json", (context: any) => JSON.stringify(context, null, 2));
+    Handlebars.registerHelper("json", (context) => JSON.stringify(context, null, 2));
   }
 
   //region Template Helpers
@@ -153,7 +171,7 @@ export interface {{name}} {
     }
 
     if (property.onlyPrimitives) {
-      const names = Array.from(property.sampleTypes).map((vt) => TSPrintor.propertyType(vt));
+      const names = Array.from(property.sampleTypes).map((vt) => Print2TypeScript.propertyType(vt));
       const uniques = [...new Set(names)];
       return uniques.join(" | ");
     }

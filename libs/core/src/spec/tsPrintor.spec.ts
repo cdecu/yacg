@@ -1,6 +1,5 @@
 import * as assert from "assert";
-import { convertTSIntfName, convertTSPropertyName } from "../lib/ts/tsUtils";
-import { TSPrintor } from "../lib/ts/tsPrintor";
+import { convertTSIntfName, convertTSPropertyName, Print2TypeScript } from "../lib/print2TypeScript";
 
 describe("TS Printor", function () {
   it("convertTSIntfName", function () {
@@ -14,13 +13,13 @@ describe("TS Printor", function () {
 });
 
 test("TSPrintor", () => {
-  const p = new TSPrintor({});
   const ami = {
-    ami: <any>{},
+    ami: {},
     name: "test",
     description: "test",
     sampleSize: 0,
   };
   ami.ami = ami;
+  const p = new Print2TypeScript(ami, {});
   expect(() => p.printModel(ami)).toThrow();
 });

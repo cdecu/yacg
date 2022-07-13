@@ -8,19 +8,28 @@ import { Parser } from "./app/parser";
  * Just a Logger implementation
  */
 class CliLogger implements logHelper {
-  constructor(config: Config) {}
+  constructor(private readonly config: Config) {}
 
   log(message: string, level: LogLevel = LogLevel.Error): void {
     console.log(message);
   }
   info(message: any): void {
-    console.log(JSON.stringify(message));
+    if (this.config.logLevel <= LogLevel.Info) {
+      if (typeof message === "string") {
+        console.log("#", message);
+      } else if (typeof message === "number") {
+        console.log("#", message);
+      } else {
+        console.log("#", JSON.stringify(message));
+      }
+    }
   }
 }
 
 const config = new Config();
 const cliLogger = new CliLogger(config);
 const parser = new Parser(config, cliLogger);
+
 if (config.file === "-") {
   Config.readJsonFromStdin().then((txt) => {
     parser.parse(txt);

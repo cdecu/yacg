@@ -1,6 +1,14 @@
-{
-  "test" : "toto",
-  "albert" : "son pere"
-}
-
-
+[
+  {
+    "license_key": {
+      "hide_advanced_setting_panel": null,
+      "options": [{ "license_key_id": 11676, "license_option_id": 15, "parameter": null }]
+    }
+  },
+  {
+    "license_key": {
+      "hide_advanced_setting_panel": null,
+      "options": [{ "license_key_id": 22222, "license_option_id": 22, "parameter": null }]
+    }
+  }
+]

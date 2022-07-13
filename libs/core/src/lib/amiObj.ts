@@ -1,5 +1,7 @@
 import { AmiPropr } from "./amiPropr";
-import { intfModel, intfObjInfo, intfPropr } from "@yacg/core";
+import { intfModel } from "./intfModel";
+import { intfPropr } from "./intfPropr";
+import { intfObjInfo } from "./intfObj";
 
 /**
  * Object Abstract Info
@@ -35,7 +37,7 @@ export class AmiObj<AMI> implements intfObjInfo<AMI> {
       found.addSampleVal(val);
       return found;
     }
-    const newOne = new AmiPropr<AMI>(this.ami, key);
+    const newOne = new AmiPropr<AMI>(this.ami, this, key);
     this.properties.push(newOne);
     newOne.addSampleVal(val);
     return newOne;
@@ -44,7 +46,7 @@ export class AmiObj<AMI> implements intfObjInfo<AMI> {
   /**
    * Detect properties type from sample values
    */
-  public detectTypes(model: intfModel<AMI>) {
-    this.properties.forEach((prop) => prop.detectType(model, this));
+  public detectTypes() {
+    this.properties.forEach((prop) => prop.detectType());
   }
 }

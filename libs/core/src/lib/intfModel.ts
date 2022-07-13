@@ -5,7 +5,7 @@ import { intfPropr } from "./intfPropr";
  * Abstract Model Info aka AMI
  */
 export interface intfModel<AMI> {
-  ami: intfModel<AMI>;
+  //  ami: intfModel<AMI>;
   name: string;
   description: string;
   rootIntf?: intfObjInfo<AMI>;
@@ -21,7 +21,6 @@ export interface intfModel<AMI> {
    * @param val
    * @returns {intfObjInfo}
    */
-
   addPropr?: (val: intfPropr<AMI>) => intfObjInfo<AMI>;
 
   /**

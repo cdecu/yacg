@@ -45,7 +45,7 @@ export class AmiModel {
       this.rootIntf.sampleSize = this.sampleSize;
       if (!this.sampleSize) throw "Empty Array";
       json.forEach((i) => this.parseJSON(i));
-      this.rootIntf.detectTypes(this);
+      this.rootIntf.detectTypes();
       return;
     }
     if (typeof json === "object") {
@@ -53,7 +53,7 @@ export class AmiModel {
       this.rootIntf.sampleSize = 1;
       this.sampleSize = 1;
       this.parseJSON(json);
-      this.rootIntf.detectTypes(this);
+      this.rootIntf.detectTypes();
       return;
     }
     throw "Unsupported JSON";
@@ -73,7 +73,9 @@ export class AmiModel {
    * @param prop
    */
   public addPropr(prop: intfPropr<AmiModel>): intfObjInfo<AmiModel> {
-    const childObject = new AmiObj<AmiModel>(this.ami, `${this.rootIntf.name}.${prop.name}`, prop.description);
+    console.log("addPropr", prop.owner.name, prop.name);
+
+    const childObject = new AmiObj<AmiModel>(this.ami, `${prop.owner.name}.${prop.name}`, prop.description);
     this.childIntfs.push(childObject);
     return childObject;
   }

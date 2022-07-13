@@ -1,13 +1,13 @@
-export * from "./lib/models/intfLogger";
-export * from "./lib/models/intfPropr";
-export * from "./lib/models/intfObj";
-export * from "./lib/models/intfModel";
-export * from "./lib/models/intfPrintor";
+export * from "./lib/intfLogger";
+export * from "./lib/intfPropr";
+export * from "./lib/intfObj";
+export * from "./lib/intfModel";
+export * from "./lib/intfPrintor";
 
-export * from "./lib/models/amiUtils";
-export * from "./lib/models/amiPropr";
-export * from "./lib/models/amiObj";
-export * from "./lib/models/amiModel";
+export * from "./lib/amiUtils";
+export * from "./lib/amiPropr";
+export * from "./lib/amiObj";
+export * from "./lib/amiModel";
 
-export * from "./lib/ts/tsUtils";
-export * from "./lib/ts/tsPrintor";
+export * from "./lib/print2TypeScript";
+export * from "./lib/print2Pascal";
