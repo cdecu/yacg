@@ -1,8 +1,8 @@
 {
   "test": "toto",
   "albert": "son pere",
-  "file": "test.json",
+  "file": "test-items.json",
   "language": "so",
-  "intfName": "MyInterface",
+  "intfName": "PlugAndPosItem",
   "intfDescr": "Intf Descr"
 }

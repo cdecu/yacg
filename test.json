@@ -1,14 +1,56 @@
-[
-  {
-    "license_key": {
-      "hide_advanced_setting_panel": null,
-      "options": [{ "license_key_id": 11676, "license_option_id": 15, "parameter": null }]
-    }
-  },
-  {
-    "license_key": {
-      "hide_advanced_setting_panel": null,
-      "options": [{ "license_key_id": 22222, "license_option_id": 22, "parameter": null }]
-    }
+{
+  "license_key": {
+    "id": 11676,
+    "customer_id": 97956,
+    "invoice_customer_id": null,
+    "code": "004.000001.caisse1",
+    "validity_date_begin": "2015-01-01T00:00:00",
+    "validity_date_end": "2060-12-10T00:00:00",
+    "active": true,
+    "creation_date": "2022-01-21T12:15:22.527",
+    "modification_date": "2022-07-20T10:55:52.7962146",
+    "creation_global_user_id": 47,
+    "modification_global_user_id": 32,
+    "blocked": false,
+    "blocked_reason": null,
+    "pos_message": null,
+    "sale_line_id": null,
+    "device_id": "004.000001.caisse1",
+    "remote_entity_id": null,
+    "remote_entity_name": null,
+    "remote_store_id": null,
+    "remote_pos_id": null,
+    "remote_journal_id": null,
+    "web_service_id": 1,
+    "web_service_url": "https://ws-pos-dev.plugandpos.com",
+    "web_service_login": "advensys",
+    "web_service_password": "ad26",
+    "easystore_version": "",
+    "proactivity": true,
+    "last_license_validation_date": "2022-07-20T10:55:52.7805889",
+    "last_available_version": null,
+    "sale_header_id": null,
+    "note": null,
+    "contact_id": null,
+    "is_demo": false,
+    "last_version": null,
+    "force_latest_version": false,
+    "latest_web_service_url": null,
+    "latest_web_service_login": null,
+    "latest_web_service_password": null,
+    "fdm_installation": false,
+    "signalr": false,
+    "device_os_version": null,
+    "device_model": null,
+    "google_account": null,
+    "application_type": 6,
+    "hide_advanced_setting_panel": null,
+    "options": [
+      {
+        "license_key_id": 11676,
+        "license_option_id": 15,
+        "parameter": null
+      }
+    ]
   }
-]
+}

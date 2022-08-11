@@ -1,16 +1,17 @@
-import { isPrimitive, valType } from "./amiUtils";
-import { intfModel } from "./intfModel";
-import { intfPropr, propertyType } from "./intfPropr";
-import { intfObjInfo } from "./intfObj";
+import { isPrimitive, propertyType, valType } from "./amiUtils";
+import type { AmiObj } from "./amiObj";
+import type { AmiModel } from "./amiModel";
 
 /**
  * Object Property Abstract Info
  */
-export class AmiPropr<AMI> implements intfPropr<AMI> {
-  public type = propertyType.otUnknown;
-  public itemsType!: intfPropr<AMI>;
+export class AmiPropr {
   public description = "";
+  public examples = "";
   public required = true;
+  public type = propertyType.otUnknown;
+  public mapType?: AmiObj;
+  public listTypes = new Set<AmiObj>([]);
   public sampleTypes = new Set<propertyType>([]);
   public sampleValues = new Set<any>([]);
   private sampleSize = 0;
@@ -19,21 +20,13 @@ export class AmiPropr<AMI> implements intfPropr<AMI> {
    * Just initialize name.
    * TODO I dont like to pass the logger everywhere but ...
    */
-  constructor(public readonly ami: intfModel<AMI>, public readonly owner: intfObjInfo<AMI>, public readonly name: string) {}
-
-  /**
-   * Is Simple Type
-   * @returns boolean
-   */
-  get simpleType(): boolean {
-    return this.sampleTypes.size <= 1;
-  }
+  constructor(public readonly ami: AmiModel, public readonly owner: AmiObj, public readonly name: string) {}
 
   /**
    * only Primitive Types
    * @returns boolean
    */
-  get onlyPrimitives(): boolean {
+  public onlyPrimitives(): boolean {
     let cntCplex = 0;
     this.sampleTypes.forEach((vt) => (cntCplex += isPrimitive(vt) ? 0 : 1));
     return !cntCplex;
@@ -41,42 +34,46 @@ export class AmiPropr<AMI> implements intfPropr<AMI> {
 
   /**
    * Add a Sample value the property. Detect the typeof
-   * @param val
-   * @returns {intfPropr}
    */
-  addSampleVal(val: any): intfPropr<AMI> {
+  public addSampleVal(val: any): void {
     const vt = valType(val);
-    this.type ||= vt;
-    this.sampleSize += 1;
-    this.sampleTypes.add(vt);
-    this.sampleValues.add(val);
-    return this;
+    if (vt != propertyType.otNull) {
+      this.type = vt;
+      this.sampleTypes.add(vt);
+      this.sampleValues.add(val);
+      this.sampleSize += 1;
+    }
   }
 
   /**
    * Detect type from sample values
    */
   public detectType() {
-    //  Build description
+    //  Build examples
     if (this.sampleValues.size > 0) {
       const examples = Array.from(this.sampleValues)
         .map((v) => JSON.stringify(v))
         .filter((v) => v != '""')
-        .join(";");
+        .join("\n");
       if (examples) {
-        this.description += "@example " + examples;
+        this.examples += examples;
       }
     }
 
-    // Required if always present
-    this.required = this.ami.sampleSize === this.sampleSize;
+    // clean types
+    if (this.sampleTypes.has(propertyType.otFloat)) {
+      this.sampleTypes.delete(propertyType.otInteger);
+      this.sampleTypes.delete(propertyType.otBigInt);
+      if (this.sampleTypes.size === 1) {
+        this.type = this.sampleTypes.values().next().value;
+      }
+    }
 
-    // Count complex types (not primitive)
-    let cntCplex = 0;
-    this.sampleTypes.forEach((vt) => (cntCplex += isPrimitive(vt) ? 0 : 1));
+    // Property is Required if always present
+    this.required = this.sampleSize > 1 && this.ami.sampleSize === this.sampleSize;
 
-    // Property is a Primitive type(s)
-    if (!cntCplex) {
+    // Property is one or many Primitive type(s)
+    if (this.onlyPrimitives()) {
       if (this.sampleTypes.size === 1) {
         this.detectEnumType();
       } else {
@@ -85,77 +82,59 @@ export class AmiPropr<AMI> implements intfPropr<AMI> {
       return;
     }
 
-    // Property is a List
-    if (this.sampleTypes.size === 1 && this.type === propertyType.otList) {
-      // need to detect list elements type
-      this.detectListSubType();
-      return;
+    // Property has only one type
+    if (this.sampleTypes.size === 1) {
+      switch (this.type) {
+        case propertyType.otList:
+          this.detectListType();
+          return;
+        case propertyType.otMap:
+          this.detectMapType();
+          return;
+        default:
+          return;
+      }
     }
 
-    // Property is a Map  {}
-    if (this.sampleTypes.size === 1 && this.type === propertyType.otMap && this.ami.addPropr) {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>");
-      const o = this.ami.addPropr(this);
-      console.log(o.name);
-      o.sampleSize = this.sampleTypes.size;
-      this.sampleValues.forEach((v: any) => {
-        if (v !== undefined && v !== null) {
-          Object.entries(v).forEach(([key, val]) => {
-            o.addSampleProperty(key, val);
-          });
-        }
-      });
-      o.detectTypes();
-      // this.type  = o.typeName;
-      return;
-    }
-
-    // Property is a null
-    if (this.sampleTypes.size === 1 && this.type === propertyType.otUnknown) {
-      return;
-    }
-
-    // NO yet handled
-    throw `Unsupported type ${this.ami.name}.${this.owner.name}.${this.name}`;
-  }
-
-  /**
-   * Extract list items type(s) from sampleValues
-   */
-  public detectListSubType() {
-    // Build itemTypes Set
-    const itemTypes = new Set<propertyType>([]);
-    this.sampleValues.forEach((v: any[]) => v.forEach((i: any) => itemTypes.add(valType(i))));
-
-    // Count Cplex itemTypes
-    let cntCplex = 0;
-    itemTypes.forEach((vt) => (cntCplex += isPrimitive(vt) ? 0 : 1));
-    if (!cntCplex) {
-      // Only Primitive types
-      this.itemsType = new AmiPropr(this.ami, this.owner, this.name + ".item");
-      this.sampleValues.forEach((v: any[]) => v.forEach((i: any) => this.itemsType.addSampleVal(i)));
-      return;
-    }
-    // List of Object ?
-    // this.logger?.log(`List ${model.name}.${owner.name}.${this.name} items type`);
-    this.itemsType = new AmiPropr(this.ami, this.owner, this.name + ".item");
+    // Property has many types
+    this.detectComplexTypes();
+    return;
   }
 
   /**
    * Try to find enum ex: CardColor : SPADE, HEART, DIAMOND, CLUB.
    * So type is converted to an Enum or a Type Alias.
-   * @private
    */
   private detectEnumType() {
-    console.log(`EnumType ${this.ami.name}.${this.owner.name}.${this.name}`);
+    // console.log(`EnumType ${this.ami.name}.${this.owner.name}.${this.name} : Type ${this.type}`);
   }
 
   /**
    * Try to find union type like number | string
    * So type is converted to a Type Alias.
-   * @private
    */
   private detectUnionType() {
-    console.log(`UnionType ${this.ami.name}.${this.owner.name}.${this.name}`);
+    // console.log(`UnionType ${this.ami.name}.${this.owner.name}.${this.name} : Type ${this.type}`);
+  }
+
+  /**
+   * Finalize list property
+   */
+  private detectListType() {
+    // console.log("detectListType");
+  }
+
+  /**
+   * Finalize map property
+   */
+  private detectMapType() {
+    // console.log("detectMapType");
+  }
+
+  /**
+   * Finalize complex property
+   */
+  private detectComplexTypes() {
+    // console.log("detectMapType");
   }
 }

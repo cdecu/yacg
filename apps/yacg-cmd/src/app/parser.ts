@@ -10,7 +10,7 @@ export class Parser {
   private src?: any;
   private trg?: any;
   private readonly ami: AmiModel;
-  private readonly printor: intfModelPrintor<AmiModel>;
+  private readonly printor: intfModelPrintor;
 
   constructor(private config: Config, private cliLogger: logHelper) {
     this.ami = new AmiModel();
@@ -31,13 +31,13 @@ export class Parser {
     }
 
     this.ami.loadFromJSON(this.config.intfName, this.config.intfDescr, this.src);
-    this.trg = this.printor.printModel(this.ami);
+    this.trg = this.printor.printModel();
 
     this.cliLogger?.info("> Print to " + this.config.language);
     console.log(this.trg);
   }
 
-  private createPrintor(): intfModelPrintor<AmiModel> {
+  private createPrintor(): intfModelPrintor {
     switch (this.config.language) {
       case "pascal":
         return new Print2PascalRecord(this.ami, this.config);

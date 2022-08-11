@@ -1,22 +1,21 @@
-import { intfObjInfo } from "./intfObj";
 import { AmiObj } from "./amiObj";
-import { intfPropr } from "./intfPropr";
+import { propertyType, valType } from "./amiUtils";
 
 /**
  * Abstract Model Info
  */
 export class AmiModel {
-  public readonly ami: AmiModel;
-  public readonly rootIntf: intfObjInfo<AmiModel>;
-  public readonly childIntfs: intfObjInfo<AmiModel>[] = [];
   public sampleSize = 0;
+  public addExamples = true;
+  public readonly rootObj: AmiObj;
+  public readonly childObjs: AmiObj[] = [];
+  private src: any[] = [];
 
   /**
    * Abstract Model Info constructor
    */
   constructor(public name = "MyIntf", public description = "") {
-    this.ami = this;
-    this.rootIntf = new AmiObj(this.ami, name, description);
+    this.rootObj = new AmiObj(this, name, description);
   }
 
   /**
@@ -28,55 +27,94 @@ export class AmiModel {
   public loadFromJSON(name: string, description: string, json: any): void {
     this.name = name;
     this.description = description;
-    this.rootIntf.clear(name, description);
-    this.childIntfs.length = 0;
-    this.sampleSize = 0;
-    this.loadJSON(json);
-  }
+    this.rootObj.clear(name, description);
 
-  /**
-   * Load from a JSON Map or Array
-   * @param json
-   */
-  public loadJSON(json: any): void {
+    this.childObjs.length = 0;
+    this.childObjs.push(this.rootObj);
+
+    this.sampleSize = 0;
+    this.src.length = 0;
+
     if (Array.isArray(json)) {
-      // this.logger?.log(`load Sample Array of ${json.length}`);
       this.sampleSize = json.length;
-      this.rootIntf.sampleSize = this.sampleSize;
+      this.rootObj.sampleSize = this.sampleSize;
       if (!this.sampleSize) throw "Empty Array";
-      json.forEach((i) => this.parseJSON(i));
-      this.rootIntf.detectTypes();
-      return;
-    }
-    if (typeof json === "object") {
-      // this.logger?.log('load Sample');
-      this.rootIntf.sampleSize = 1;
+      this.src = json;
+    } else if (typeof json === "object") {
+      this.rootObj.sampleSize = 1;
+      this.src.push(json);
       this.sampleSize = 1;
-      this.parseJSON(json);
-      this.rootIntf.detectTypes();
-      return;
+    } else {
+      // invalid JSON
     }
-    throw "Unsupported JSON";
+
+    if (this.src.length === 0) throw "Unsupported Source JSON";
+
+    this.parseJSON();
   }
 
   /**
    * Add all object entries as property
-   * @param json
    */
-  public parseJSON(json: any): void {
-    Object.entries(json).forEach(([key, val]) => this.rootIntf.addSampleProperty(key, val));
+  private parseJSON(): void {
+    // loop on source JSON
+    this.src.forEach((j) => {
+      if (j !== undefined && j !== null && typeof j === "object") {
+        Object.entries(j).forEach(([key, val]) => this.addObjPropr(this.rootObj, key, val));
+      }
+    });
+    // Detect properties type from sample values
+    this.childObjs.forEach((obj) => obj.properties.forEach((prop) => prop.detectType()));
+  }
+
+  /**
+   * Add a child object to the model. This is the recursive part
+   */
+  private addObjPropr(obj: AmiObj, name: string, val: any): void {
+    const propr = obj.addSampleProperty(name);
+    propr.addSampleVal(val);
+
+    switch (propr.type) {
+      case propertyType.otMap:
+        // recurse on child object
+        const o = this.addObjMapPropr(`${propr.owner.name}.${propr.name}`);
+        propr.mapType = o;
+        Object.entries(val).forEach(([key, val]) => this.addObjPropr(o, key, val));
+        break;
+      case propertyType.otList:
+        // recurse on array item object
+        const a = val as Array<any>;
+        a.forEach((item) => {
+          switch (valType(item)) {
+            case propertyType.otMap:
+              const o = this.addObjMapPropr(`${propr.owner.name}.${propr.name}`);
+              propr.listTypes.add(o);
+              Object.entries(item).forEach(([key, val]) => this.addObjPropr(o, key, val));
+              break;
+            case propertyType.otList:
+              break;
+            default:
+              break;
+          }
+        });
+        break;
+      default:
+        break;
+    }
   }
 
   /**
    * add Child Object needed by subtype
-   * @returns {AmiObj}
-   * @param prop
    */
-  public addPropr(prop: intfPropr<AmiModel>): intfObjInfo<AmiModel> {
-    console.log("addPropr", prop.owner.name, prop.name);
+  private addObjMapPropr(name: string): AmiObj {
+    const found = this.childObjs.find((i) => i.name === name);
+    if (found) {
+      found.sampleSize += 1;
+      return found;
+    }
 
-    const childObject = new AmiObj<AmiModel>(this.ami, `${prop.owner.name}.${prop.name}`, prop.description);
-    this.childIntfs.push(childObject);
+    const childObject = new AmiObj(this, name, "");
+    this.childObjs.push(childObject);
     return childObject;
   }
 }

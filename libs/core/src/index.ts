@@ -1,7 +1,4 @@
 export * from "./lib/intfLogger";
-export * from "./lib/intfPropr";
-export * from "./lib/intfObj";
-export * from "./lib/intfModel";
 export * from "./lib/intfPrintor";
 
 export * from "./lib/amiUtils";

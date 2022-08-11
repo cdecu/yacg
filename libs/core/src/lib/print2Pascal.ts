@@ -1,20 +1,25 @@
 import * as Handlebars from "handlebars";
 import { IntfModelPrintor, intfModelPrintor } from "./intfPrintor";
-import { intfModel } from "./intfModel";
-import { intfPropr, propertyType } from "./intfPropr";
-import { intfObjInfo } from "./intfObj";
+import { AmiModel } from "./amiModel";
+import { AmiObj } from "./amiObj";
+import { AmiPropr } from "./amiPropr";
+import { propertyType } from "./amiUtils";
 
 /**
  * Print to Pascal Record.
  */
-export class Print2PascalRecord<AMI> extends IntfModelPrintor implements intfModelPrintor<AMI> {
+export class Print2PascalRecord extends IntfModelPrintor implements intfModelPrintor {
+  //region properties
+  /**
+   * prepared "scope" used to fill the Handlebars Template
+   */
+  private scope?: any;
+
   /**
    * Typescript Interface
    * TODO Should use precompiled Handlebars Templates !
-   * @type {string}
-   * @private
    */
-  private readonly tsIntfTmplSrc = `
+  private readonly pascalTmplSrc = `
 {{~JDocDescr 0 description~}}
 type {{name}}  = record
   {{#properties}}
@@ -25,21 +30,17 @@ type {{name}}  = record
 `;
   /**
    * Compiled Handlebars Template
-   * @type {any}
-   * @private
    */
-  private tsIntfTmpl: any = false;
+  private pascalTmpl: any = false;
   /**
    * prepared "scope" used to fill the Handlebars Template
-   * @type {any}
-   * @private
    */
-  private scope?: any;
+  //endregion
 
-  constructor(public readonly ami: intfModel<AMI>, public readonly config: any) {
+  constructor(public readonly ami: AmiModel, public readonly config: any) {
     super();
     // add custom helpers to Handlebars
-    Handlebars.registerHelper("JDocDescr", (indent: number, val: string) => Print2PascalRecord<AMI>.JDocDescr(indent, val));
+    Handlebars.registerHelper("JDocDescr", (indent: number, val: string) => Print2PascalRecord.JDocDescr(indent, val));
     Handlebars.registerHelper("Indent", (indent: number) => " ".repeat(indent));
     Handlebars.registerHelper("json", (context) => JSON.stringify(context, null, 2));
   }
@@ -47,43 +48,40 @@ type {{name}}  = record
   //region Template Helpers
   /**
    * Convert `value` to a valid TS Interface Name
-   * @param {string} value
-   * @returns {string}
    */
   private static convertIntfName(value: string): string {
+    const intfName = value.replaceAll(/[." -]/g, "_");
+    return intfName.replaceAll(/___|__/g, "_");
+  }
+
+  /**
+   * Convert `value` to a valid TS Property Name
+   */
+  private static convertPropertyName(value: string): string {
     const intfName = value.replaceAll(/[." -]/g, "_");
     return intfName.replaceAll(/___|__/g, "_");
   }
   //endregion
 
   /**
-   * Convert `value` to a valid TS Property Name
-   * @param {string} value
-   * @returns {string}
-   */
-  private static convertPropertyName(value: string): string {
-    const intfName = value.replaceAll(/[." -]/g, "_");
-    return intfName.replaceAll(/___|__/g, "_");
-  }
-
-  /**
    * printModel return the typescript code declaring ...
-   * @param {intfModel} model
-   * @returns {string}
    */
-  public printModel(model: intfModel<AMI>): string {
-    if (!model.rootIntf) {
+  public printModel(): string {
+    if (!this.ami.rootObj) {
       throw new Error("No root interface found");
     }
-    if (!this.tsIntfTmpl) {
-      this.tsIntfTmpl = Handlebars.compile(this.tsIntfTmplSrc, { noEscape: true });
+    if (!this.pascalTmpl) {
+      this.pascalTmpl = Handlebars.compile(this.pascalTmplSrc, { noEscape: true });
     }
-    this.assignTemplateScope(model, model.rootIntf);
-    let ts = this.tsIntfTmpl(this.scope);
-    if (model.childIntfs && model.childIntfs.length > 0) {
-      model.childIntfs.forEach((o) => {
-        this.assignTemplateScope(model, o);
-        ts = ts + "\n" + this.tsIntfTmpl(this.scope);
+
+    this.assignTemplateScope(this.ami.rootObj);
+    this.scope.description ??= this.ami.description ?? "";
+
+    let ts = this.pascalTmpl(this.scope);
+    if (this.ami.childObjs && this.ami.childObjs.length > 0) {
+      this.ami.childObjs.forEach((o) => {
+        this.assignTemplateScope(o);
+        ts = ts + "\n" + this.pascalTmpl(this.scope);
       });
     }
     return ts;
@@ -92,31 +90,28 @@ type {{name}}  = record
   //region Handlebars Scope Builder functions
   /**
    * Convert Abstract model into scope to be consumed by handlebars
-   * @param {intfModel} model
-   * @param o
-   * @private
    */
-  private assignTemplateScope(model: intfModel<AMI>, o: intfObjInfo<AMI>) {
+  private assignTemplateScope(o: AmiObj) {
     this.scope = {
-      name: Print2PascalRecord<AMI>.convertIntfName(o.name),
-      description: o.description ?? model.description ?? this.config["description"] ?? "",
+      name: Print2PascalRecord.convertIntfName(o.name),
+      description: o.description ?? this.config["description"] ?? "",
       properties: this.buildProperties(o),
     };
   }
 
-  private buildProperties(o: intfObjInfo<AMI>): unknown[] {
+  private buildProperties(o: AmiObj): unknown[] {
     return o.properties.map((property) => {
       return {
         ...property,
-        name: Print2PascalRecord<AMI>.convertPropertyName(property.name),
+        name: Print2PascalRecord.convertPropertyName(property.name),
         decl: ":",
         type: this.buildPropertyType(property),
       };
     });
   }
 
-  private buildPropertyType(property: intfPropr<AMI>): string {
-    if (property.simpleType) {
+  private buildPropertyType(property: AmiPropr): string {
+    if (property.sampleTypes.size <= 1) {
       switch (property.type) {
         case propertyType.otBigInt:
           return "int64";
@@ -129,11 +124,12 @@ type {{name}}  = record
         case propertyType.otBoolean:
           return "boolean";
         case propertyType.otList:
-          return "Array of " + this.buildPropertyType(property.subType);
+        // if (property.listTypes instanceof AmiPropr) {
+        //   return "Array of " + this.buildPropertyType(property.itemsType);
+        // }
       }
     }
-
-    return "variant" + property.type;
+    return "variant" + " " + property.type + " / " + property.mapType + " / " + property.listTypes;
   }
 
   //endregion

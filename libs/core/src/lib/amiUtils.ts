@@ -1,4 +1,18 @@
-import { propertyType } from "./intfPropr";
+/**
+ * AMI known types
+ */
+export const enum propertyType {
+  otUnknown,
+  otNull,
+  otString,
+  otBoolean,
+  otInteger,
+  otBigInt,
+  otFloat,
+  otList,
+  otMap,
+  otFunction,
+}
 
 /**
  * Find the `value` type
@@ -7,7 +21,7 @@ import { propertyType } from "./intfPropr";
  */
 export function valType(value: any): propertyType {
   // catch null and undefined
-  if (value == null) return propertyType.otUnknown;
+  if (value == null) return propertyType.otNull;
 
   // catch arrays
   if (Array.isArray(value)) return propertyType.otList;
@@ -71,4 +85,16 @@ export function isPrimitive(value: propertyType): boolean {
       return true;
   }
   return false;
+}
+
+/**
+ * Capitalize first character
+ * @param {string} str
+ * @return {string}
+ */
+export function capitalizeFirstLetter(str: string): string {
+  if (!str) {
+    return "";
+  }
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
