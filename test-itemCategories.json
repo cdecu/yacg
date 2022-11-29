@@ -1,0 +1,42 @@
+[
+  {
+    "id": 779,
+    "uid": "e770e129-b20d-4a7d-9864-9c813e996c73",
+    "name_fr": "Food ",
+    "name_en": "Food",
+    "name_nl": "Food",
+    "type": 1
+  },
+  {
+    "uid": "7c159e03-f3a4-6042-9a27-241c20e4f0f5",
+    "id": 789,
+    "name_nl": "GROUPE 1",
+    "name_fr": "GROUPE 1",
+    "name_en": "GROUPE 1",
+    "type": 1
+  },
+  {
+    "uid": "fe0f3215-8463-f843-b284-dba35bb1a29c",
+    "id": 790,
+    "name_nl": "GROUPE 2",
+    "name_fr": "GROUPE 2",
+    "name_en": "GROUPE 2",
+    "type": 1
+  },
+  {
+    "uid": "357d785c-40fa-cf4f-9c7b-8f1fa90a1fab",
+    "id": 791,
+    "name_nl": "GROUPE 3",
+    "name_fr": "GROUPE 3",
+    "name_en": "GROUPE 3",
+    "type": 1
+  },
+  {
+    "uid": "b7d5340f-9f7e-ee40-ba2a-63b9a82f8496",
+    "id": 792,
+    "name_nl": "GROUPE 4",
+    "name_fr": "GROUPE 4",
+    "name_en": "GROUPE 4",
+    "type": 1
+  }
+]

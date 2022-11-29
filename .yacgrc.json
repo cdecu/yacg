@@ -1,8 +1,14 @@
 {
   "test": "toto",
   "albert": "son pere",
-  "file": "test-items.json",
+  "afile": "test-itemCategories.json",
+  "aintfName": "PPItemCategory",
+  "file": "test-itemLevels.json",
+  "intfName": "PPItemLevel",
+  "cfile": "test-items.json",
+  "cintfName": "PPItem",
+  "xintfName": "PPPrinter",
+  "xfile": "test-printers.json",
   "language": "so",
-  "intfName": "PlugAndPosItem",
   "intfDescr": "Intf Descr"
 }

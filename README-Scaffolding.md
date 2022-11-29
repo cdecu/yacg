@@ -4,8 +4,9 @@
 node --version
 npm --version
 git --version
-npm i -g @angular/cli
+npm i -g nx
 npm i -g @nrwl/schematics
+npm i -g @angular/cli
 ```
 - Create a new Nx workspace
 ```bash
@@ -19,4 +20,3 @@ nx g @nrwl/angular:application --name=yacg --style=scss --viewEncapsulation=Emul
 nx g @nrwl/angular:application --name=yacg-ng --style=scss --viewEncapsulation=Emulated --skipTests --unitTestRunner=jest --e2eTestRunner=cypress --linter=eslint --strict --standaloneConfig --setParserOptionsProject --addTailwind --no-interactive --dry-run
 nx g @nrwl/node:application --name=yacg-cmd --linter=eslint --unitTestRunner=jest --standaloneConfig --no-interactive --dry-run
 ```
-

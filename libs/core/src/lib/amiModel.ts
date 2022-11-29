@@ -15,7 +15,7 @@ export class AmiModel {
    * Abstract Model Info constructor
    */
   constructor(public name = "MyIntf", public description = "") {
-    this.rootObj = new AmiObj(this, name, description);
+    this.rootObj = new AmiObj(this, this, name, description);
   }
 
   /**
@@ -76,8 +76,10 @@ export class AmiModel {
 
     switch (propr.type) {
       case propertyType.otMap:
+        // Remove trailing "s"
+        const elName = propr.name.replace(/s$/, "");
         // recurse on child object
-        const o = this.addObjMapPropr(`${propr.owner.name}.${propr.name}`);
+        const o = this.addObjMapPropr(propr.owner,`${propr.owner.name}.${elName}`);
         propr.mapType = o;
         Object.entries(val).forEach(([key, val]) => this.addObjPropr(o, key, val));
         break;
@@ -87,7 +89,9 @@ export class AmiModel {
         a.forEach((item) => {
           switch (valType(item)) {
             case propertyType.otMap:
-              const o = this.addObjMapPropr(`${propr.owner.name}.${propr.name}`);
+              // Remove trailing "s"
+              const elName = propr.name.replace(/s$/, "");
+              const o = this.addObjMapPropr(propr.owner,`${propr.owner.name}.${elName}`);
               propr.listTypes.add(o);
               Object.entries(item).forEach(([key, val]) => this.addObjPropr(o, key, val));
               break;
@@ -106,14 +110,14 @@ export class AmiModel {
   /**
    * add Child Object needed by subtype
    */
-  private addObjMapPropr(name: string): AmiObj {
+  private addObjMapPropr(owner: AmiObj, name: string): AmiObj {
     const found = this.childObjs.find((i) => i.name === name);
     if (found) {
       found.sampleSize += 1;
       return found;
     }
 
-    const childObject = new AmiObj(this, name, "");
+    const childObject = new AmiObj(this, owner, name, "");
     this.childObjs.push(childObject);
     return childObject;
   }

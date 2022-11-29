@@ -18,7 +18,7 @@ export class Config {
     // load cmd args
     const argv = Config.yargs();
     // load config file
-    const configFile = argv.configFile;
+    const configFile = argv['configFile'];
     const explorer = cosmiconfigSync("yacg");
     const { config, filepath } = (typeof configFile === "string" ? explorer.load(configFile) : explorer.search()) || {};
     // merge config file and argv

@@ -1,0 +1,50 @@
+[
+  {
+    "active": true,
+    "uid": "3fbb3ec7-cffc-f346-9f8e-e35f12c90ba6",
+    "organisation_id": 1351,
+    "id": 1057,
+    "name": "ADDITION"
+  },{
+  "active": false,
+  "uid": "4d855604-cf9d-2440-8a74-cdb3d54a9ded",
+  "organisation_id": 1351,
+  "id": 1058,
+  "name": "BAR"
+},{
+  "active": false,
+  "uid": "7633a469-7baa-b342-b693-6b1e623ae072",
+  "organisation_id": 1351,
+  "id": 1059,
+  "name": "CUISINE"
+},{
+  "active": true,
+  "uid": "13db337a-6e1a-d344-aed3-8e77d5d07168",
+  "organisation_id": 1351,
+  "id": 1060,
+  "name": "Route Suite\/Sep."
+},{
+  "active": true,
+  "uid": "a1244b27-96ea-7d4b-80b2-10b1007caf8b",
+  "organisation_id": 1351,
+  "id": 1061,
+  "name": "Recap.Desti de la Cde"
+},{
+  "active": true,
+  "uid": "df23b49c-cd90-fc40-ad3b-54dea690f9d0",
+  "organisation_id": 1351,
+  "id": 1062,
+  "name": "Desti de l'article pr\u00e9cedant"
+},{
+  "active": true,
+  "uid": "6cc0794e-3261-c04a-b727-2355d6e933be",
+  "organisation_id": 1351,
+  "id": 1063,
+  "name": "Production IZIII"
+},{
+  "active": true,
+  "uid": "9cbc9f77-90d6-394c-abb5-4a93c317c41c",
+  "organisation_id": 1351,
+  "id": 1064,
+  "name": "IMP SERVEUR"
+}]

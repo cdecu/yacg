@@ -1,4 +1,4 @@
-import * as Handlebars from "handlebars";
+import * as Handlebars from 'handlebars';
 import { IntfModelPrintor, intfModelPrintor } from "./intfPrintor";
 import { AmiModel } from "./amiModel";
 import { AmiObj } from "./amiObj";

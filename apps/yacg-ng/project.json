@@ -1,13 +1,12 @@
 {
+  "name": "yacg-ng",
   "projectType": "application",
   "sourceRoot": "apps/yacg-ng/src",
   "prefix": "yacg",
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/yacg-ng",
         "index": "apps/yacg-ng/src/index.html",
@@ -15,13 +14,8 @@
         "polyfills": "apps/yacg-ng/src/polyfills.ts",
         "tsConfig": "apps/yacg-ng/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
-        "assets": [
-          "apps/yacg-ng/src/favicon.ico",
-          "apps/yacg-ng/src/assets"
-        ],
-        "styles": [
-          "apps/yacg-ng/src/styles.scss"
-        ],
+        "assets": ["apps/yacg-ng/src/favicon.ico", "apps/yacg-ng/src/assets"],
+        "styles": ["apps/yacg-ng/src/styles.scss"],
         "scripts": []
       },
       "configurations": {
@@ -78,17 +72,12 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": [
-          "apps/yacg-ng/**/*.ts",
-          "apps/yacg-ng/**/*.html"
-        ]
+        "lintFilePatterns": ["apps/yacg-ng/**/*.ts", "apps/yacg-ng/**/*.html"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/apps/yacg-ng"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/apps/yacg-ng"],
       "options": {
         "jestConfig": "apps/yacg-ng/jest.config.ts",
         "passWithNoTests": true

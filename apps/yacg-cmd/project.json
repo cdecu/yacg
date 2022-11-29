@@ -1,20 +1,19 @@
 {
+  "name": "yacg-cmd",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/yacg-cmd/src",
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/node:webpack",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "executor": "@nrwl/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/yacg-cmd",
         "main": "apps/yacg-cmd/src/main.ts",
         "tsConfig": "apps/yacg-cmd/tsconfig.app.json",
-        "assets": [
-          "apps/yacg-cmd/src/assets"
-        ]
+        "assets": ["apps/yacg-cmd/src/assets"],
+        "target": "node",
+        "compiler": "tsc"
       },
       "configurations": {
         "production": {
@@ -43,20 +42,14 @@
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "apps/yacg-cmd/**/*.ts"
-        ]
+        "lintFilePatterns": ["apps/yacg-cmd/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/apps/yacg-cmd"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/apps/yacg-cmd"],
       "options": {
         "jestConfig": "apps/yacg-cmd/jest.config.ts",
         "passWithNoTests": true

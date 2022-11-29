@@ -1,0 +1,47 @@
+[
+  {
+    "item_azure_image1_default": null,
+    "active": true,
+    "uid": "70c4cd72-4150-42c3-b9f2-4a91cc1b39cc",
+    "accept_lunch_voucher": false,
+    "description_nl": null,
+    "description_fr": null,
+    "description_en": null,
+    "accept_eco_voucher": false,
+    "order_number": 0,
+    "accept_book_voucher": false,
+    "item_azure_image1_width": 512,
+    "accept_sport_culture_voucher": false,
+    "vat_rate": 0.1,
+    "item_azure_image1_height": 512,
+    "accept_cadeau_voucher": false,
+    "column_number": 1,
+    "id": 1002,
+    "azure_image1": null,
+    "accept_transport_voucher": false,
+    "name_nl": null,
+    "name_fr": "TestLevel",
+    "name_en": null,
+    "type": 1,
+    "color": null,
+    "kiosk_active": true,
+    "click_and_collect_active": true,
+    "vat_rate_takeaway": 0.1
+  },
+  {
+    "id": 779,
+    "uid": "e770e129-b20d-4a7d-9864-9c813e996c73"
+  },
+  {
+    "id": 779,
+    "uid": "e770e129-b20d-4a7d-9864-9c813e996c73"
+  },
+  {
+    "id": 779,
+    "uid": "e770e129-b20d-4a7d-9864-9c813e996c73"
+  },
+  {
+    "id": 779,
+    "uid": "e770e129-b20d-4a7d-9864-9c813e996c73"
+  }
+]
