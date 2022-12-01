@@ -1,54 +1,59 @@
 import { AmiObj } from "./amiObj";
 import { propertyType, valType } from "./amiUtils";
+import { logHelper } from "./intfLogger";
+import { ConfigIntf, InputFileIntf } from "./amiConfig";
 
 /**
  * Abstract Model Info
  */
 export class AmiModel {
+  public src!: InputFileIntf;
+  public name = "";
+  public description = "";
   public sampleSize = 0;
   public addExamples = true;
   public readonly rootObj: AmiObj;
   public readonly childObjs: AmiObj[] = [];
-  private src: any[] = [];
+  private json: any[] = [];
 
   /**
    * Abstract Model Info constructor
    */
-  constructor(public name = "MyIntf", public description = "") {
-    this.rootObj = new AmiObj(this, this, name, description);
+  constructor(public readonly config: ConfigIntf, public readonly cliLogger: logHelper) {
+    this.rootObj = new AmiObj(this, this);
   }
 
   /**
    * Load from a JSON Map or Array
-   * @param name
-   * @param description
-   * @param json
-   */
-  public loadFromJSON(name: string, description: string, json: any): void {
-    this.name = name;
-    this.description = description;
-    this.rootObj.clear(name, description);
+   * @param {InputFileIntf} f
+   * */
+  public loadFromJSON(f: InputFileIntf): void {
+    this.src = f;
+    this.name = f.intfName;
+    this.description = f.intfDescr;
+    this.rootObj.clear(this.name, this.description);
 
     this.childObjs.length = 0;
     this.childObjs.push(this.rootObj);
 
     this.sampleSize = 0;
-    this.src.length = 0;
+    this.json.length = 0;
 
-    if (Array.isArray(json)) {
-      this.sampleSize = json.length;
+    if (Array.isArray(this.src.json)) {
+      this.sampleSize = this.src.json.length;
       this.rootObj.sampleSize = this.sampleSize;
       if (!this.sampleSize) throw "Empty Array";
-      this.src = json;
-    } else if (typeof json === "object") {
+      this.json = this.src.json;
+    } else if (typeof this.src.json === "object") {
       this.rootObj.sampleSize = 1;
-      this.src.push(json);
+      this.json.push(this.src.json);
       this.sampleSize = 1;
     } else {
       // invalid JSON
+      throw "Unsupported Source JSON";
     }
 
-    if (this.src.length === 0) throw "Unsupported Source JSON";
+    if (this.json.length === 0) throw "Empty Source JSON";
 
     this.parseJSON();
   }
@@ -58,7 +63,7 @@ export class AmiModel {
    */
   private parseJSON(): void {
     // loop on source JSON
-    this.src.forEach((j) => {
+    this.json.forEach((j) => {
       if (j !== undefined && j !== null && typeof j === "object") {
         Object.entries(j).forEach(([key, val]) => this.addObjPropr(this.rootObj, key, val));
       }
@@ -79,7 +84,7 @@ export class AmiModel {
         // Remove trailing "s"
         const elName = propr.name.replace(/s$/, "");
         // recurse on child object
-        const o = this.addObjMapPropr(propr.owner,`${propr.owner.name}.${elName}`);
+        const o = this.addObjMapPropr(propr.owner, `${propr.owner.name}.${elName}`);
         propr.mapType = o;
         Object.entries(val).forEach(([key, val]) => this.addObjPropr(o, key, val));
         break;
@@ -91,7 +96,7 @@ export class AmiModel {
             case propertyType.otMap:
               // Remove trailing "s"
               const elName = propr.name.replace(/s$/, "");
-              const o = this.addObjMapPropr(propr.owner,`${propr.owner.name}.${elName}`);
+              const o = this.addObjMapPropr(propr.owner, `${propr.owner.name}.${elName}`);
               propr.listTypes.add(o);
               Object.entries(item).forEach(([key, val]) => this.addObjPropr(o, key, val));
               break;

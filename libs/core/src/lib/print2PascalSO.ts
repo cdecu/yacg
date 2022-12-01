@@ -2,19 +2,14 @@ import * as Handlebars from "handlebars";
 import { IntfModelPrintor, intfModelPrintor } from "./intfPrintor";
 import { AmiModel } from "./amiModel";
 import { AmiObj } from "./amiObj";
-import { AmiPropr } from "./amiPropr";
-import { capitalizeFirstLetter, isPrimitive, propertyType } from "./amiUtils";
+import { isPrimitive, propertyType } from "./amiUtils";
+import { ConfigIntf } from "./amiConfig";
 
 /**
  * Print to pascal using SuperObject lib.
  */
 export class Print2PascalSO extends IntfModelPrintor implements intfModelPrintor {
   //region properties
-  /**
-   * prepared "scope" used to fill the Handlebars Template
-   */
-  private scope?: any;
-
   /**
    * Handlebars Template text
    */
@@ -42,13 +37,13 @@ export class Print2PascalSO extends IntfModelPrintor implements intfModelPrintor
       ];
   private   
     {{#properties}}
-    {{~Indent 4~}}f{{proprName}} : {{typeName}};
+    {{~Indent 4~}}f{{Fill proprName 20}}: {{typeName}};
     {{/properties}}
     /// <summary>Runtime properties</summary>
-    fTag     : NativeInt;
-    fTagKey  : String;
-    fTagObj  : TObject;
-    fTagGUID : TGUID;
+    fTag                  : NativeInt;
+    fTagKey               : String;
+    fTagObj               : TObject;
+    fTagGUID              : TGUID;
     
     {{#properties}}
     {{#if needGetter}}
@@ -184,11 +179,11 @@ Begin
   if (vt1 in [varNull,varEmpty]) then Begin
     Case vt2 of
       varNull,varEmpty:Begin
-        // Null egual Null
+        // Null equal Null
         Result:=0
         end;
       varString,varUString:Begin
-        // Empty String egual null 
+        // Empty String equal null 
         if (val2='') then
           Result:= 0 else
           Result:=-1
@@ -267,7 +262,7 @@ procedure {{typeName}}.Clear;
 Begin
   AssignedFields:=[];
   {{#properties}}
-    {{~Indent 2~}}{{~propClear .}};
+    {{~Indent 2~}}{{~propClear . 20}};
   {{/properties}}
 end;
 
@@ -542,14 +537,16 @@ end;
 `;
   //endregion
 
-  constructor(public readonly ami: AmiModel, public readonly config: any) {
-    super();
+  constructor(public readonly ami: AmiModel, public readonly config: ConfigIntf) {
+    super(ami, config);
+    this.fileExt = ".pas";
+    this.outputFmt = "pascal-so";
     // add custom helpers to Handlebars
     Handlebars.registerHelper("DelphiDescr", (indent: number, val1: string, val2: string) => Print2PascalSO.DelphiDescr(indent, val1, val2));
     Handlebars.registerHelper("Indent", (indent: number) => " ".repeat(indent));
-    Handlebars.registerHelper("propClear", (propr) => this.propClear(propr));
+    Handlebars.registerHelper("Fill", (val: string, fill: number) => (fill > val.length ? val + " ".repeat(fill - val.length) : val));
+    Handlebars.registerHelper("propClear", (propr, fill) => this.propClear(propr, fill));
     Handlebars.registerHelper("propCompare", (propr) => this.propCompare(propr));
-    Handlebars.registerHelper("propSetter", (propr) => this.propSetter(propr));
     Handlebars.registerHelper("propAssign", (propr) => this.propAssign(propr));
     Handlebars.registerHelper("proprAsSO", (propr) => this.proprAsSO(propr));
     Handlebars.registerHelper("Equal", (v1, v2) => v1 == v2);
@@ -558,23 +555,6 @@ end;
   }
 
   //region Template Helpers
-  /**
-   * Convert `value` to a valid TS Interface Name
-   */
-  private static buildObjName(value: string): string {
-    const intfName = value.replaceAll(/[." -]/g, "_").replaceAll(/___|__/g, "_");
-    return capitalizeFirstLetter(intfName);
-  }
-  private static buildTypeName(value: string): string {
-    return "T" + Print2PascalSO.buildObjName(value);
-  }
-
-  /**
-   * Convert `value` to a valid TS Property Name
-   */
-  private static buildProprName(value: string): string {
-    return value.replaceAll(/[." -]/g, "_").replaceAll(/___|__/g, "_");
-  }
 
   private static type2SOFct(type: propertyType): string {
     switch (type) {
@@ -607,154 +587,25 @@ end;
         return "O";
     }
   }
-
-  private static buildPropertyType(propr: AmiPropr): string {
-    if (propr.sampleTypes.size === 1) {
-      switch (propr.type) {
-        case propertyType.otBigInt:
-          return "int64";
-        case propertyType.otFloat:
-          return "extended";
-        case propertyType.otInteger:
-          return "integer";
-        case propertyType.otString:
-          return "string";
-        case propertyType.otBoolean:
-          return "boolean";
-      }
-    }
-
-    if (propr.mapType instanceof AmiObj) {
-      return Print2PascalSO.buildTypeName(propr.mapType.name);
-    }
-
-    if (propr.listTypes.size === 1) {
-      const [i] = propr.listTypes;
-      return Print2PascalSO.buildTypeName(i.name)+'Array';
-    }
-    if (propr.listTypes.size > 1) {
-      return "Array of variant";
-    }
-
-    return "variant";
-  }
-
-  private static buildArrayElType(propr: AmiPropr): string {
-    if (propr.sampleTypes.size === 1) {
-      switch (propr.type) {
-        case propertyType.otBigInt:
-          return "int64";
-        case propertyType.otFloat:
-          return "extended";
-        case propertyType.otInteger:
-          return "integer";
-        case propertyType.otString:
-          return "string";
-        case propertyType.otBoolean:
-          return "boolean";
-      }
-    }
-
-    if (propr.mapType instanceof AmiObj) {
-      return Print2PascalSO.buildTypeName(propr.mapType.name);
-    }
-
-    if (propr.listTypes.size === 1) {
-      const [i] = propr.listTypes;
-      return Print2PascalSO.buildTypeName(i.name);
-    }
-    if (propr.listTypes.size > 1) {
-      return "Array of variant";
-    }
-
-    return "variant";
-  }
   //endregion
-
-  /**
-   * printModel return the typescript code declaring ...
-   */
-  public printModel(): string {
-    if (!this.ami.rootObj) {
-      throw new Error("No root interface found");
-    }
-    if (!this.ami.childObjs || this.ami.childObjs.length == 0) {
-      throw new Error("Empty Source");
-    }
-
-    let ts = "Unit " + this.ami.name + ";\n\n";
-    ts += "Interface\n\n";
-    ts += "Uses System.Classes, System.Math, System.SysUtils, System.Variants, SuperObject,rmx.GUID;\n\n";
-
-    ts += "Type\n";
-    let tsIntfTmpl = Handlebars.compile(this.IntfTmplSrc, { noEscape: true });
-    this.ami.childObjs.reverse().forEach((o) => {
-      this.assignTemplateScope(o);
-      ts += tsIntfTmpl(this.scope);
-      ts += "\n";
-    });
-
-    ts += "Implementation\n\n";
-
-    tsIntfTmpl = Handlebars.compile(this.ImplConstDefTmplSrc, { noEscape: true });
-    this.ami.childObjs.reverse().forEach((o) => {
-      this.assignTemplateScope(o);
-      ts += tsIntfTmpl(this.scope);
-      ts += "\n";
-    });
-    tsIntfTmpl = Handlebars.compile(this.ImplUtilsTmplSrc, { noEscape: true });
-    this.ami.childObjs.reverse().forEach((o) => {
-      this.assignTemplateScope(o);
-      ts += tsIntfTmpl(this.scope);
-      ts += "\n";
-    });
-    tsIntfTmpl = Handlebars.compile(this.ImplTmplSrc, { noEscape: true });
-    this.ami.childObjs.reverse().forEach((o) => {
-      this.assignTemplateScope(o);
-      ts += tsIntfTmpl(this.scope);
-      ts += "\n";
-    });
-
-    ts += "end.\n";
-
-    return ts;
-  }
 
   //region Handlebars Scope Builder functions
   /**
-   * Convert Abstract model into scope to be consumed by handlebars
-   */
-  private assignTemplateScope(o: AmiObj) {
-    this.scope = {
-      ami_name: o.ami.name,
-      owner_name: o.owner.name,
-      isRoot: o.ami === o.owner,
-      name: o.name,
-      typeName: Print2PascalSO.buildTypeName(o.name),
-      objName: Print2PascalSO.buildObjName(o.name),
-      properties: this.buildProperties(o),
-      description: o.description,
-    };
-    this.scope.requiredProperties = this.scope.properties.filter((p: any) => p.required);
-    if (!this.scope.description) {
-      this.scope.description ??= this.ami.name == o.name ? this.ami.description ?? this.config["description"] ?? "" : "";
-    }
-  }
-
-  /**
    * Build the properties default value.
    */
-  private propClear(propr: any): string {
+  private propClear(propr: any, fill: number = 25): string {
+    const filler = fill > propr.proprName.length ? " ".repeat(fill - propr.proprName.length) : " ";
+
     if (propr.sampleTypes.size === 1) {
       switch (propr.type) {
         case propertyType.otBigInt:
         case propertyType.otFloat:
         case propertyType.otInteger:
-          return "f" + propr.proprName + " := 0";
+          return "f" + propr.proprName + filler + ":= 0";
         case propertyType.otString:
-          return "f" + propr.proprName + " := ''";
+          return "f" + propr.proprName + filler + ":= ''";
         case propertyType.otBoolean:
-          return "f" + propr.proprName + " := False";
+          return "f" + propr.proprName + filler + ":= False";
       }
     }
 
@@ -766,7 +617,7 @@ end;
       return "SetLength(" + "f" + propr.proprName + ", 0)";
     }
 
-    return "f" + propr.proprName + " := NULL";
+    return "f" + propr.proprName + filler + ":= NULL";
   }
 
   /**
@@ -805,12 +656,6 @@ end;
     }
 
     return `Result := CompareVariant(obj1.f${propr.proprName},obj2.f${propr.proprName})`;
-  }
-  /**
-   * Build the properties compare Self and aSource
-   */
-  private propSetter(propr: any): string {
-    return "xxxxxx";
   }
 
   /**
@@ -861,23 +706,61 @@ end;
     return `o.O[_JSON_${propr.proprName}_] := SuperObject.SObj(Self.${propr.proprName})`;
   }
 
-  private buildProperties(o: AmiObj): unknown[] {
-    return o.properties.map((property) => {
-      if (!this.ami.addExamples) property.examples = "";
-
-      return {
-        ...property,
-        proprName: Print2PascalSO.buildProprName(property.name),
-        typeName: Print2PascalSO.buildPropertyType(property),
-        elTypeName: Print2PascalSO.buildArrayElType(property),
-        fieldName: Print2PascalSO.buildObjName(o.name) + "_" + Print2PascalSO.buildProprName(property.name),
-        isPrimitive: property.sampleTypes.size === 1 && isPrimitive(property.type),
-        asRef: property.listTypes.size > 0,
-        isMap: property.mapType instanceof AmiObj,
-        isArray: property.listTypes.size > 0,
-        isMultiArray: property.listTypes.size > 1,
-      };
-    });
-  }
   //endregion
+
+  /**
+   * Convert Abstract model into scope to be consumed by handlebars
+   */
+  private assignTemplateScope(o: AmiObj) {
+    this.scope = {
+      name: o.name,
+      objName: IntfModelPrintor.buildPascalObjName(o.name),
+      typeName: IntfModelPrintor.buildPascalTypeName(o.name),
+      properties: this.buildPascalProperties(o),
+      description: o.description,
+    };
+    this.finalizeScope(o);
+  }
+
+  /**
+   * printModel return the typescript code declaring ...
+   */
+  public printModel(): string {
+    let ts = "Unit " + this.ami.name + ";\n\n";
+    ts += "Interface\n\n";
+    ts += "Uses System.Classes, System.Math, System.SysUtils, System.Variants, SuperObject,rmx.GUID;\n\n";
+
+    ts += "Type\n";
+    let tsIntfTmpl = Handlebars.compile(this.IntfTmplSrc, { noEscape: true });
+    this.ami.childObjs.reverse().forEach((o) => {
+      this.assignTemplateScope(o);
+      ts += tsIntfTmpl(this.scope);
+      ts += "\n";
+    });
+
+    ts += "Implementation\n\n";
+
+    tsIntfTmpl = Handlebars.compile(this.ImplConstDefTmplSrc, { noEscape: true });
+    this.ami.childObjs.reverse().forEach((o) => {
+      this.assignTemplateScope(o);
+      ts += tsIntfTmpl(this.scope);
+      ts += "\n";
+    });
+    tsIntfTmpl = Handlebars.compile(this.ImplUtilsTmplSrc, { noEscape: true });
+    this.ami.childObjs.reverse().forEach((o) => {
+      this.assignTemplateScope(o);
+      ts += tsIntfTmpl(this.scope);
+      ts += "\n";
+    });
+    tsIntfTmpl = Handlebars.compile(this.ImplTmplSrc, { noEscape: true });
+    this.ami.childObjs.reverse().forEach((o) => {
+      this.assignTemplateScope(o);
+      ts += tsIntfTmpl(this.scope);
+      ts += "\n";
+    });
+
+    ts += "end.\n";
+
+    return ts;
+  }
 }

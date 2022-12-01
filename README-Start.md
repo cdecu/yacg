@@ -13,3 +13,13 @@ Set defaultProject in nx.json to yacg-cmd
 npm build
 ```
 
+- Customize bash
+  - add alias r='npm run'
+  - add package.json scripts
+    - "build-cmd": "nx build yacg-cmd",
+    - "cmd": "nx build yacg-cmd && node dist/apps/yacg-cmd/main.js"
+    - ...
+
+so we can use `r cmd` to build code  
+   
+

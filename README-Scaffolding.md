@@ -7,12 +7,15 @@ git --version
 npm i -g nx
 npm i -g @nrwl/schematics
 npm i -g @angular/cli
+npm i -g npm-check-updates
 ```
+
 - Create a new Nx workspace
 ```bash
 npx create-nx-workspace@latest    # blank app
 npm install --save-dev @nrwl/angular`
 ```
+
 - Create a library, app
 ```bash
 nx g @nrwl/node:library --name=core --linter=eslint --unitTestRunner=jest --tags=core --publishable --buildable --compiler=tsc --importPath=@yacg/core --testEnvironment=node --strict --standaloneConfig --setParserOptionsProject --no-interactive --dry-run

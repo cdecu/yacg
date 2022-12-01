@@ -1,44 +1,68 @@
 import * as YAML from "yaml";
-import { AmiModel, intfModelPrintor, logHelper, Print2PascalRecord, Print2TypeScript } from "@yacg/core";
-import { Config } from "./config";
-import { Print2PascalSO } from "../../../../libs/core/src/lib/print2PascalSO";
+import { AmiModel, ConfigIntf, InputFileIntf, intfModelPrintor, logHelper, Print2PascalRecord, Print2PascalSO, Print2TypeScript } from "@yacg/core";
 
 /**
  * Parse a YAML,JSON string into a AMI
  */
 export class Parser {
-  private src?: any;
-  private trg?: any;
-  private readonly ami: AmiModel;
-  private readonly printor: intfModelPrintor;
+  private src?: InputFileIntf;
+  private trg?: string;
+  private ami: AmiModel;
 
-  constructor(private config: Config, private cliLogger: logHelper) {
-    this.ami = new AmiModel();
-    this.printor = this.createPrintor();
-  }
+  constructor(private config: ConfigIntf, private cliLogger: logHelper) {}
 
   /**
    * Parse a YAML,JSON string into a AMI
-   * @param {string} txt
+   * @param {InputFileIntf} f
    */
-  parse(txt: string) {
-    this.cliLogger?.info("< Parsing " + this.config.file);
+  parse(f: InputFileIntf) {
+    this.cliLogger?.log("< Init " + f.file);
+    this.ami = new AmiModel(this.config, this.cliLogger);
+    this.src = f;
     try {
-      this.src = JSON.parse(txt);
+      f.json = JSON.parse(f.text);
     } catch (err) {
       // this.cliLogger?.info("< Parsing " + this.config.file);
-      this.src = YAML.parse(txt);
+      f.json = YAML.parse(f.text);
     }
 
-    this.ami.loadFromJSON(this.config.intfName, this.config.intfDescr, this.src);
-    this.trg = this.printor.printModel();
+    this.cliLogger?.log("< Parsing " + f.file);
+    this.ami.loadFromJSON(this.src);
+    if (!this.ami.rootObj) {
+      throw new Error("No root interface found");
+    }
+    if (!this.ami.childObjs || this.ami.childObjs.length == 0) {
+      throw new Error("Empty Source");
+    }
+    this.cliLogger?.log("< Parsing done");
 
-    this.cliLogger?.info("> Print to " + this.config.language);
-    console.log(this.trg);
+    this.cliLogger?.log("> Print to " + this.config.outputFmt);
+    if (Array.isArray(this.config.outputFmt)) {
+      this.config.outputFmt.forEach((o) => {
+        this.printTo(o);
+      });
+    } else {
+      this.printTo(this.config.outputFmt);
+    }
+    this.cliLogger?.log("> Print done");
   }
 
-  private createPrintor(): intfModelPrintor {
-    switch (this.config.language) {
+  private printTo(outputFmt: string): string {
+    const printor = this.createPrintor(outputFmt);
+    this.trg = printor.printModel();
+    if (this.src.output === "-") {
+      console.log(this.trg);
+      return "-";
+    } else {
+      const output = (this.src.output || this.src.file) + printor.fileExt;
+      this.cliLogger?.log("> Create " + output);
+      require("fs").writeFileSync(output, this.trg);
+      return output;
+    }
+  }
+
+  private createPrintor(outputFmt: string): intfModelPrintor {
+    switch (outputFmt) {
       case "pascal":
         return new Print2PascalRecord(this.ami, this.config);
       case "superobject":

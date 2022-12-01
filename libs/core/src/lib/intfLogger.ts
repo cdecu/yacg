@@ -1,11 +1,13 @@
 /**
  * List of known log levels. Used to specify the urgency of a log message.
+ * silent, error, warn, info, verbose
  */
 export const enum LogLevel {
-  Debug,
-  Info,
-  Warn,
+  Silent,
   Error,
+  Warn,
+  Info,
+  Verbose,
 }
 
 /**
@@ -14,17 +16,9 @@ export const enum LogLevel {
  * This logger also serves as the base class of other loggers as it implements all the required utility functions.
  */
 export interface logHelper {
-  /**
-   * Print a log message.
-   *
-   * @param message  The message itself.
-   * @param level  The urgency of the log message.
-   */
-  log(message: string, level: LogLevel): void;
-  /**
-   * Print a log message.
-   *
-   * @param message  The message itself.
-   */
+  error(message: any): void;
+  warn(message: any): void;
   info(message: any): void;
+  verbose(message: any): void;
+  log(message: any): void;
 }

@@ -27,3 +27,8 @@ dist
 
 # Editors
 .idea
+/PPData/itemCategories.json.pas
+/PPData/itemLevels.json.pas
+/PPData/items.json.pas
+/PPData/printers.json.pas
+/PPData/store-printers.json.pas

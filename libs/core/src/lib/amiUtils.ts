@@ -49,6 +49,21 @@ export function valType(value: any): propertyType {
 }
 
 /**
+ * Convert a `value` to a propertyType
+ * @param value
+ * @constructor
+ */
+export function Str2Type(value: string): propertyType {
+  if (value === "boolean") return propertyType.otBoolean;
+  if (value === "bigint") return propertyType.otBigInt;
+  if (value === "function") return propertyType.otFunction;
+  if (value === "string") return propertyType.otString;
+  if (value === "integer") return propertyType.otInteger;
+  if (value === "number") return propertyType.otFloat;
+  return propertyType.otUnknown;
+}
+
+/**
  * Find the `value` type, trying to JSON.parse string.
  * @param {any} value
  * @returns {propertyType}

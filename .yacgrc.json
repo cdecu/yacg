@@ -1,14 +1,64 @@
 {
   "test": "toto",
   "albert": "son pere",
-  "afile": "test-itemCategories.json",
-  "aintfName": "PPItemCategory",
-  "file": "test-itemLevels.json",
-  "intfName": "PPItemLevel",
-  "cfile": "test-items.json",
-  "cintfName": "PPItem",
-  "xintfName": "PPPrinter",
-  "xfile": "test-printers.json",
-  "language": "so",
-  "intfDescr": "Intf Descr"
+  "logLevel": 9,
+  "outputFmt": ["so"],
+  "intfDescr": "Intf Descr",
+  "files": [
+    {
+      "file": "PPData/itemCategories.json",
+      "intfName": "PPItemCategory"
+    },
+    {
+      "file": "PPData/itemLevels.json",
+      "intfName": "PPItemLevel"
+    },
+    {
+      "file": "PPData/items.json",
+      "intfName": "PPItem"
+    },
+    {
+      "file": "PPData/printers.json",
+      "intfName": "PPPrinter"
+    },
+    {
+      "file": "PPData/store-printers.json",
+      "intfName": "PPStorePrinter"
+    }
+  ],
+  "dico": {
+    "uid": {
+      "defaultType": "string"
+    },
+    "name_nl": {
+      "defaultType": "string"
+    },
+    "name_fr": {
+      "defaultType": "string"
+    },
+    "name_en": {
+      "defaultType": "string"
+    },
+    "name2_nl": {
+      "defaultType": "string"
+    },
+    "name2_fr": {
+      "defaultType": "string"
+    },
+    "name2_en": {
+      "defaultType": "string"
+    },
+    "description_nl": {
+      "defaultType": "string"
+    },
+    "description_fr": {
+      "defaultType": "string"
+    },
+    "description_en": {
+      "defaultType": "string"
+    },
+    "rescue_printer_id": {
+      "defaultType": "integer"
+    }
+  }
 }
