@@ -1,0 +1,56 @@
+[
+  {
+    "id": 11,
+    "uid": "6260ed3b-ee82-41e3-a380-716456e7242d",
+    "name_fr": "Accompagnements",
+    "name_en": "Side dishes",
+    "name_nl": "Begeleidingen",
+    "quantity_type": 3,
+    "minimum_selected_item": null,
+    "maximum_selected_item": null,
+    "order_number": 0,
+    "retrieve_price": false,
+    "propositions_to": [
+      {
+        "id": 942,
+        "uid": null,
+        "proposition_uid": "6260ed3b-ee82-41e3-a380-716456e7242d",
+        "to_item_uid": "ca311e3f-50a1-4bb5-9c5e-2f039603879e",
+        "order_number": 1,
+        "quantity": null,
+        "price": 5.0,
+        "print_on_ticket": true
+      },
+      {
+        "id": 943,
+        "uid": null,
+        "proposition_uid": "6260ed3b-ee82-41e3-a380-716456e7242d",
+        "to_item_uid": "f7e2e763-cb2e-458b-89b5-f006b78d42d8",
+        "order_number": 2,
+        "quantity": 1.0,
+        "price": null,
+        "print_on_ticket": true
+      },
+      {
+        "id": 944,
+        "uid": null,
+        "proposition_uid": "6260ed3b-ee82-41e3-a380-716456e7242d",
+        "to_item_uid": "6c295b6d-880e-461f-87c9-492526ee325b",
+        "order_number": 3,
+        "quantity": null,
+        "price": null,
+        "print_on_ticket": true
+      },
+      {
+        "id": 945,
+        "uid": null,
+        "proposition_uid": "6260ed3b-ee82-41e3-a380-716456e7242d",
+        "to_item_uid": "d6da23c3-8d4b-4420-bb99-580c13be25b6",
+        "order_number": 4,
+        "quantity": 2.0,
+        "price": null,
+        "print_on_ticket": true
+      }
+    ]
+  }
+]

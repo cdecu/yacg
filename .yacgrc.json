@@ -2,9 +2,19 @@
   "test": "toto",
   "albert": "son pere",
   "logLevel": 9,
-  "outputFmt": ["so"],
+  "outputFmt": [
+    "so","pascal","typescript"
+  ],
   "intfDescr": "Intf Descr",
   "files": [
+    {
+      "file": "PPData/printers.json",
+      "intfName": "PPPrinter"
+    },
+    {
+      "file": "PPData/store-printers.json",
+      "intfName": "PPStorePrinter"
+    },
     {
       "file": "PPData/itemCategories.json",
       "intfName": "PPItemCategory"
@@ -14,19 +24,34 @@
       "intfName": "PPItemLevel"
     },
     {
+      "file": "PPData/itemRanks.json",
+      "intfName": "PPItemRank"
+    },
+    {
+      "file": "PPData/itemPropositions.json",
+      "intfName": "PPItemProposition"
+    },
+    {
       "file": "PPData/items.json",
       "intfName": "PPItem"
     },
     {
-      "file": "PPData/printers.json",
-      "intfName": "PPPrinter"
+      "file": "PPData/matrices.json",
+      "intfName": "PPMatrice"
     },
     {
-      "file": "PPData/store-printers.json",
-      "intfName": "PPStorePrinter"
+      "file": "PPData/Customers.json",
+      "intfName": "PPCustomer"
+    },
+    {
+      "file": "PPData/sales.json",
+      "intfName": "PPSale"
     }
   ],
   "dico": {
+    "item_category1_id": {
+      "defaultType": "integer"
+    },
     "uid": {
       "defaultType": "string"
     },

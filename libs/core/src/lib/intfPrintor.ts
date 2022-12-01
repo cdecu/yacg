@@ -75,6 +75,37 @@ export class IntfModelPrintor {
   //endregion
 
   //region Pascal Helpers
+  public static PascalType(type: propertyType): string {
+    switch (type) {
+      case propertyType.otBigInt:
+        return "int64";
+      case propertyType.otFloat:
+        return "extended";
+      case propertyType.otInteger:
+        return "integer";
+      case propertyType.otString:
+        return "string";
+      case propertyType.otBoolean:
+        return "boolean";
+      default:
+        return "variant";
+    }
+  }
+
+  public static PascalCompareFct(type: propertyType): string {
+    switch (type) {
+      case propertyType.otBigInt:
+      case propertyType.otFloat:
+      case propertyType.otInteger:
+      case propertyType.otBoolean:
+        return "CompareValue";
+      case propertyType.otString:
+        return "CompareStr";
+      default:
+        return "CompareVariant";
+    }
+  }
+
   public static buildPascalObjName(value: string): string {
     const intfName = value.replaceAll(/[." -]/g, "_").replaceAll(/___|__/g, "_");
     return capitalizeFirstLetter(intfName);
@@ -88,54 +119,60 @@ export class IntfModelPrintor {
     return value.replaceAll(/[." -]/g, "_").replaceAll(/___|__/g, "_");
   }
 
-  public buildPropertyPascalType(propr: AmiPropr, isElem: boolean = false): string {
+  public buildPascalObjProprTypeName(propr: AmiPropr, isElem: boolean = false): string {
     if (propr.sampleTypes.size === 1) {
       switch (propr.type) {
         case propertyType.otBigInt:
-          return "int64";
         case propertyType.otFloat:
-          return "extended";
         case propertyType.otInteger:
-          return "integer";
         case propertyType.otString:
-          return "string";
         case propertyType.otBoolean:
-          return "boolean";
+          return IntfModelPrintor.PascalType(propr.type);
       }
     }
 
-    if (propr.mapType instanceof AmiObj) {
-      return IntfModelPrintor.buildPascalTypeName(propr.mapType.name);
+    if (propr.mapAmiObj instanceof AmiObj) {
+      return IntfModelPrintor.buildPascalTypeName(propr.mapAmiObj.name);
+    }
+
+    if (propr.listAmiObj instanceof AmiObj) {
+      const typeName = IntfModelPrintor.buildPascalTypeName(propr.listAmiObj.name);
+      const arrayTypeName = typeName + "Array";
+      return isElem ? typeName : arrayTypeName;
     }
 
     if (propr.listTypes.size === 1) {
-      const [i] = propr.listTypes;
-      const typeName = IntfModelPrintor.buildPascalTypeName(i.name);
-      return isElem ? typeName : typeName + "Array";
+      const [type] = propr.listTypes;
+      const typeName = IntfModelPrintor.PascalType(type);
+      const arrayTypeName = IntfModelPrintor.buildPascalTypeName(propr.name) + "ArrayOf" + capitalizeFirstLetter(typeName);
+      return isElem ? typeName : arrayTypeName;
     }
 
-    if (propr.listTypes.size > 1) {
-      this.ami.cliLogger?.error(`Unknown type for property ${propr.name} in object ${propr.owner.name}`);
-      return "Array of variant";
+    if (propr.type === propertyType.otList) {
+      this.ami.cliLogger?.error(`** ${propr.owner.name}.${propr.name} Array of Variant (listTypes:${propr.listTypes.size})`);
+      const typeName = IntfModelPrintor.PascalType(propertyType.otUnknown);
+      const arrayTypeName = IntfModelPrintor.buildPascalTypeName(propr.name) + "ArrayOf" + capitalizeFirstLetter(typeName);
+      return isElem ? typeName : arrayTypeName;
     }
 
-    this.ami.cliLogger?.error(`Unknown type for property ${propr.name} in object ${propr.owner.name}`);
+    this.ami.cliLogger?.error(`** ${propr.owner.name}.${propr.name} Variant (sampleTypes:${propr.sampleTypes.size})`);
     return "variant";
   }
 
   public buildPascalProperties(o: AmiObj): unknown[] {
     return o.properties.map((propr) => {
+      console.assert(propr.mapAmiObj instanceof AmiObj === (propr.type === propertyType.otMap), "Invalid otMap");
       return {
         ...propr,
         proprName: IntfModelPrintor.buildPascalObjProprName(propr.name),
-        typeName: this.buildPropertyPascalType(propr),
-        elTypeName: this.buildPropertyPascalType(propr, true),
+        typeName: this.buildPascalObjProprTypeName(propr),
+        elTypeName: this.buildPascalObjProprTypeName(propr, true),
         fieldName: IntfModelPrintor.buildPascalObjName(o.name) + "_" + IntfModelPrintor.buildPascalObjProprName(propr.name),
         isPrimitive: propr.sampleTypes.size === 1 && isPrimitive(propr.type),
-        asRef: propr.listTypes.size > 0,
-        isMap: propr.mapType instanceof AmiObj,
-        isArray: propr.listTypes.size > 0,
-        isMultiArray: propr.listTypes.size > 1,
+        isAmiObj: propr.mapAmiObj instanceof AmiObj,
+        isArray: propr.type === propertyType.otList,
+        isArrayOfAmiObj: propr.listAmiObj instanceof AmiObj,
+        asConstRef: propr.mapAmiObj instanceof AmiObj || propr.listAmiObj instanceof AmiObj,
         examples: this.ami.addExamples ? propr.examples : "",
       };
     });

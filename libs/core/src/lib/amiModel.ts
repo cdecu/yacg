@@ -85,24 +85,24 @@ export class AmiModel {
         const elName = propr.name.replace(/s$/, "");
         // recurse on child object
         const o = this.addObjMapPropr(propr.owner, `${propr.owner.name}.${elName}`);
-        propr.mapType = o;
         Object.entries(val).forEach(([key, val]) => this.addObjPropr(o, key, val));
+        propr.mapAmiObj = o;
         break;
       case propertyType.otList:
         // recurse on array item object
         const a = val as Array<any>;
         a.forEach((item) => {
-          switch (valType(item)) {
+          const itemType = valType(item);
+          switch (itemType) {
             case propertyType.otMap:
               // Remove trailing "s"
               const elName = propr.name.replace(/s$/, "");
               const o = this.addObjMapPropr(propr.owner, `${propr.owner.name}.${elName}`);
-              propr.listTypes.add(o);
               Object.entries(item).forEach(([key, val]) => this.addObjPropr(o, key, val));
-              break;
-            case propertyType.otList:
+              propr.listAmiObj = o;
               break;
             default:
+              propr.listTypes.add(itemType);
               break;
           }
         });

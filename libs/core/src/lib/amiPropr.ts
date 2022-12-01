@@ -9,10 +9,10 @@ export class AmiPropr {
   public description = "";
   public examples = "";
   public required = true;
-  public needGetter = false;
   public type = propertyType.otUnknown;
-  public mapType?: AmiObj;
-  public listTypes = new Set<AmiObj>([]);
+  public mapAmiObj?: AmiObj;
+  public listAmiObj?: AmiObj;
+  public listTypes = new Set<propertyType>([]);
   public sampleTypes = new Set<propertyType>([]);
   public sampleValues = new Set<any>([]);
   private sampleSize = 0;

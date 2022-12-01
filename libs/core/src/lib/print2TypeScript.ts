@@ -113,13 +113,12 @@ export interface {{name}} {
       }
     }
 
-    if (propr.mapType instanceof AmiObj) {
-      return Print2TypeScript.buildIntfName(propr.mapType.name);
+    if (propr.mapAmiObj instanceof AmiObj) {
+      return Print2TypeScript.buildIntfName(propr.mapAmiObj.name);
     }
 
-    if (propr.listTypes.size === 1) {
-      const [i] = propr.listTypes;
-      return Print2TypeScript.buildIntfName(i.name) + "Array";
+    if (propr.listAmiObj instanceof AmiObj) {
+      return Print2TypeScript.buildIntfName(propr.listAmiObj.name) + "Array";
     }
 
     if (propr.onlyPrimitives()) {

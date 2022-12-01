@@ -15,6 +15,12 @@ export class Print2PascalRecord extends IntfModelPrintor implements intfModelPri
   private readonly pascalTmplSrc = `
 {{~DelphiDescr 0 "summary" description}}
 type 
+  {{#properties}}
+  {{#if isArray}} 
+    {{~Indent 2~}}{{typeName}} = Array of {{elTypeName}};
+  {{/if}}  
+  {{/properties}}
+
   {{typeName}}  = record
   protected
   {{#properties}}

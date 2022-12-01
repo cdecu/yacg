@@ -49,7 +49,7 @@ export class Print2PascalSO extends IntfModelPrintor implements intfModelPrintor
     {{#if needGetter}}
     function Get_{{proprName}}:{{typeName}};
     {{/if}}    
-    procedure Set_{{proprName}}(Const {{#if asRef}}[ref] {{/if}} Value:{{typeName}});
+    procedure Set_{{proprName}}(Const {{#if asConstRef}}[ref] {{/if}} Value:{{typeName}});
     {{/properties}}
 
   public   
@@ -133,6 +133,9 @@ export class Print2PascalSO extends IntfModelPrintor implements intfModelPrintor
     function FindByUID(Const guid:TGUID;Var Ptr:{{typeName}}Ptr):Boolean;overload;
     /// <summary>Find Item</summary>
     function FindBy(Const [ref] Obj1:{{typeName}};Const Field:{{typeName}}Field;Var Ptr:{{typeName}}Ptr):Integer;overload;
+
+    ///<summary>Build JSON Object</summary>
+    function AsSO(Const AllProps:Boolean=False):ISuperObject;
 
     /// <summary>Array Length</summary>
     property Count : Integer     read GetCount;
@@ -314,7 +317,7 @@ Begin
     {{#if isPrimitive}}
     Self.f{{proprName}}:=aSource.f{{proprName}};
     {{else}}
-    {{#if isMap}}
+    {{#if isAmiObj}}
     Self.f{{proprName}}.Assign(Value);
     {{else}}
     {{#if isArray}}  
@@ -324,7 +327,11 @@ Begin
     SetLength(Self.f{{proprName}},len);
     if (len>0) then Begin
       for i:=0 to Pred(len) do
+        {{#if isArrayOfAmiObj}}  
         Self.f{{proprName}}[i].Assign(aSource.f{{proprName}}[i],[]);
+        {{else}}
+        Self.f{{proprName}}[i]  := aSource.f{{proprName}}[i];
+        {{/if}}
     end end;      
     {{else}}
     Self.f{{proprName}}:=aSource.f{{proprName}};
@@ -341,7 +348,6 @@ Begin
   Result:=[];
   Self.Clear; 
   {{#properties}}
-  {{~DelphiDescr 2 "examples" examples}}
   Begin 
     var obj:ISuperObject;
     obj := aSource.O[_JSON_{{proprName}}_];
@@ -363,7 +369,6 @@ Begin
   o:=Result.AsObject;
 
   {{#properties}}
-  {{~DelphiDescr 2 "examples" examples}}
   if (AllProps) or ( {{../typeName}}Field.{{fieldName}} in AssignedFields) then Begin   
     {{proprAsSO .}};
     end;
@@ -372,13 +377,13 @@ Begin
 end;
 
 {{#properties}}
-procedure {{../typeName}}.Set_{{proprName}}(Const {{#if asRef}}[ref] {{/if}} Value:{{typeName}});
+procedure {{../typeName}}.Set_{{proprName}}(Const {{#if asConstRef}}[ref] {{/if}} Value:{{typeName}});
 Begin
   {{#if isPrimitive}}
   Include(AssignedFields,{{../typeName}}Field.{{fieldName}});
   Self.f{{proprName}}:=Value;
   {{else}}
-  {{#if isMap}}
+  {{#if isAmiObj}}
   Include(AssignedFields,{{../typeName}}Field.{{fieldName}});
   Self.f{{proprName}}.Assign(Value);
   {{else}}
@@ -390,8 +395,12 @@ Begin
   if (len>0) then Begin
     Include(AssignedFields,{{../typeName}}Field.{{fieldName}});
     for i:=0 to Pred(len) do
+      {{#if isArrayOfAmiObj}}  
       Self.f{{proprName}}[i].Assign(Value[i],[]);
-  end end;      
+      {{else}}
+      Self.f{{proprName}} := Value[i];
+      {{/if}}
+    end end;      
   {{else}}
   Include(AssignedFields,{{../typeName}}Field.{{fieldName}});
   Self.f{{proprName}}:=Value;
@@ -438,6 +447,14 @@ begin
     Ptr.fTagKey:='';
     Ptr.fTagObj:= nil;
     RAZGuid(Ptr.fTagGuid);
+    {{#properties}}
+    {{#if isAmiObj}}
+    Ptr.f{{proprName}}.fTag   := 0;
+    Ptr.f{{proprName}}.fTagKey:='';
+    Ptr.f{{proprName}}.fTagObj:= nil;
+    RAZGuid(Ptr.f{{proprName}}.fTagGuid);
+    {{/if}}    
+    {{/properties}}    
     end;
 end;
 procedure {{typeName}}s.Assign(const so: ISuperObject);
@@ -532,6 +549,19 @@ begin
     end end;
 end;
 
+function {{typeName}}s.AsSO(Const AllProps:Boolean=False):ISuperObject;
+Var i,len:Integer;
+    a:TSuperArray;
+begin
+  Result:=TSuperObject.Create(stArray);
+
+  a:=Result.AsArray;
+  len:=Length(f{{objName}}s);
+  for i:=0 to Pred(len) do Begin
+    a.Add(f{{objName}}s[i].AsSO(AllProps));
+    end
+End;
+
 {{/if}}
 
 `;
@@ -609,11 +639,11 @@ end;
       }
     }
 
-    if (propr.mapType instanceof AmiObj) {
+    if (propr.isAmiObj) {
       return "f" + propr.proprName + ".Clear";
     }
 
-    if (propr.listTypes.size > 0) {
+    if (propr.isArray) {
       return "SetLength(" + "f" + propr.proprName + ", 0)";
     }
 
@@ -625,23 +655,23 @@ end;
    */
   private propCompare(propr: any): string {
     if (propr.sampleTypes.size === 1) {
+      const CompareFct = IntfModelPrintor.PascalCompareFct(propr.type);
       switch (propr.type) {
+        case propertyType.otBoolean:
+          return `Result := ${CompareFct}(Ord(obj1.f${propr.proprName}),Ord(obj2.f${propr.proprName}))`;
         case propertyType.otBigInt:
         case propertyType.otFloat:
         case propertyType.otInteger:
-          return `Result := CompareValue(obj1.f${propr.proprName},obj2.f${propr.proprName})`;
-        case propertyType.otBoolean:
-          return `Result := Ord(obj1.f${propr.proprName}) - Ord(obj2.f${propr.proprName})`;
         case propertyType.otString:
-          return `Result := CompareStr(obj1.f${propr.proprName},obj2.f${propr.proprName})`;
+          return `Result := ${CompareFct}(obj1.f${propr.proprName},obj2.f${propr.proprName})`;
       }
     }
 
-    if (propr.mapType instanceof AmiObj) {
+    if (propr.isAmiObj) {
       return `Result := obj1.f${propr.proprName}.Compare(obj2.f${propr.proprName})`;
     }
 
-    if (propr.listTypes.size > 0) {
+    if (propr.isArrayOfAmiObj) {
       return `Var Len1,Len2:Integer;
     Len1:=Length(obj1.f${propr.proprName});
     Len2:=Length(obj2.f${propr.proprName});
@@ -655,6 +685,36 @@ end;
       end end end`;
     }
 
+    if (propr.listTypes.size === 1) {
+      const [type] = propr.listTypes;
+      const CompareFct = IntfModelPrintor.PascalCompareFct(type);
+      return `Var Len1,Len2:Integer;
+    Len1:=Length(obj1.f${propr.proprName});
+    Len2:=Length(obj2.f${propr.proprName});
+    Result:= CompareValue(Len1,Len2);
+    if Result=0 then Begin
+      Var i:Integer;
+      for i:=0 to Pred(Len1) do Begin
+        Result:=${CompareFct}(obj1.f${propr.proprName}[i],obj2.f${propr.proprName}[i]);
+        if Result<>0 then 
+          Break;
+      end end`;
+    }
+
+    if (propr.type === propertyType.otList) {
+      return `Var Len1,Len2:Integer;
+    Len1:=Length(obj1.f${propr.proprName});
+    Len2:=Length(obj2.f${propr.proprName});
+    Result:= CompareValue(Len1,Len2);
+    if Result=0 then Begin
+      Var i:Integer;
+      for i:=0 to Pred(Len1) do Begin
+        Result:=CompareVariant(obj1.f${propr.proprName}[i],obj2.f${propr.proprName}[i]);
+        if Result<>0 then 
+          Break;
+      end end`;
+    }
+
     return `Result := CompareVariant(obj1.f${propr.proprName},obj2.f${propr.proprName})`;
   }
 
@@ -662,36 +722,59 @@ end;
    * Build the properties assignment from a Source SObject
    */
   private propAssign(propr: any): string {
-    if (propr.sampleTypes.size === 1 && isPrimitive(propr.type)) {
-      return `self.f${propr.proprName} := obj.${Print2PascalSO.type2SOFct(propr.type)}`;
+    if (propr.sampleTypes.size === 1) {
+      switch (propr.type) {
+        case propertyType.otString:
+        case propertyType.otBoolean:
+        case propertyType.otInteger:
+        case propertyType.otBigInt:
+        case propertyType.otFloat:
+          return `self.f${propr.proprName} := obj.${Print2PascalSO.type2SOFct(propr.type)}`;
+      }
     }
 
-    if (propr.mapType instanceof AmiObj) {
+    if (propr.isAmiObj) {
       return `self.f${propr.proprName}.AssignSO(obj)`;
     }
 
-    if (propr.listTypes.size > 0) {
-      return `var i:Integer;
-      if (ObjectIsType(obj,stArray)) then Begin 
-        SetLength(Self.f${propr.proprName},obj.AsArray.Length);
-        for i:=0 to Pred(obj.AsArray.Length) do
-          Self.f${propr.proprName}[i].AssignSO(obj.AsArray[i]);
-        end`;
+    if (propr.isArrayOfAmiObj) {
+      return `if (ObjectIsType(obj,stArray)) then Begin
+          var i:Integer; 
+          SetLength(Self.f${propr.proprName},obj.AsArray.Length);
+          for i:=0 to Pred(obj.AsArray.Length) do
+            Self.f${propr.proprName}[i].AssignSO(obj.AsArray[i]);
+          end`;
+    }
+
+    if (propr.isArray) {
+      return `if (ObjectIsType(obj,stArray)) then Begin
+          var i:Integer; 
+          SetLength(Self.f${propr.proprName},obj.AsArray.Length);
+          for i:=0 to Pred(obj.AsArray.Length) do
+            Self.f${propr.proprName}[i] := obj.AsArray[i];
+          end`;
     }
 
     return "self.f" + propr.proprName + " := ObjAsVariant(obj)";
   }
 
   private proprAsSO(propr: any): string {
-    if (propr.sampleTypes.size === 1 && isPrimitive(propr.type)) {
-      return "o." + Print2PascalSO.type2SOPropr(propr.type) + "[_JSON_" + propr.proprName + "_] := f" + propr.proprName;
+    if (propr.sampleTypes.size === 1) {
+      switch (propr.type) {
+        case propertyType.otString:
+        case propertyType.otBoolean:
+        case propertyType.otInteger:
+        case propertyType.otBigInt:
+        case propertyType.otFloat:
+          return "o." + Print2PascalSO.type2SOPropr(propr.type) + "[_JSON_" + propr.proprName + "_] := f" + propr.proprName;
+      }
     }
 
-    if (propr.mapType instanceof AmiObj) {
+    if (propr.isAmiObj) {
       return "o.O[_JSON_" + propr.proprName + "_] := f" + propr.proprName + ".AsSO(AllProps)";
     }
 
-    if (propr.listTypes.size > 0) {
+    if (propr.isArrayOfAmiObj) {
       return `Begin 
     var p:ISuperObject;
     var i,len:Integer;
@@ -699,6 +782,18 @@ end;
     p:=TSuperObject.Create(stArray);
     for i:=0 to Pred(len) do
       p.AsArray.Add(f${propr.proprName}[i].AsSO(AllProps));
+    o.O[_JSON_${propr.proprName}_] := p 
+    end`;
+    }
+
+    if (propr.isArray) {
+      return `Begin 
+    var p:ISuperObject;
+    var i,len:Integer;
+    len:=Length(f${propr.proprName});
+    p:=TSuperObject.Create(stArray);
+    for i:=0 to Pred(len) do
+      p.AsArray.Add(SuperObject.SObj(f${propr.proprName}[i]));
     o.O[_JSON_${propr.proprName}_] := p 
     end`;
     }
