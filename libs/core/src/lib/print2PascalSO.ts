@@ -454,6 +454,17 @@ begin
     Ptr.f{{proprName}}.fTagObj:= nil;
     RAZGuid(Ptr.f{{proprName}}.fTagGuid);
     {{/if}}    
+    {{#if isArrayOfAmiObj}}
+    Begin
+    Var i1,len1:Integer;
+    len1:=Length(Ptr.f{{proprName}});
+    for i1:=0 to Pred(len1) do Begin
+      Ptr.f{{proprName}}[i1].fTag   := 0;
+      Ptr.f{{proprName}}[i1].fTagKey:='';
+      Ptr.f{{proprName}}[i1].fTagObj:=nil;
+      RAZGuid(Ptr.f{{proprName}}[i1].fTagGuid);
+    end end;
+    {{/if}}        
     {{/properties}}    
     end;
 end;

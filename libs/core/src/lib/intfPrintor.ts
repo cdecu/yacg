@@ -1,3 +1,4 @@
+import * as Handlebars from "handlebars";
 import type { AmiModel } from "./amiModel";
 import { AmiObj } from "./amiObj";
 import { ConfigIntf } from "./amiConfig";
@@ -37,7 +38,11 @@ export class IntfModelPrintor {
    * @param ami
    * @param config
    */
-  constructor(public readonly ami: AmiModel, public readonly config: ConfigIntf) {}
+  constructor(public readonly ami: AmiModel, public readonly config: ConfigIntf) {
+    Handlebars.registerHelper("Indent", (indent: number) => " ".repeat(indent));
+    Handlebars.registerHelper("Fill", (val: string, indent: number) => (indent > val.length ? val + " ".repeat(indent - val.length) : val));
+    Handlebars.registerHelper("json", (context) => JSON.stringify(context, null, 2));
+  }
 
   //region Template Helpers
   /**
@@ -65,13 +70,16 @@ export class IntfModelPrintor {
     const prefix = " ".repeat(indent);
     if (lines.length > 1) {
       let descr = prefix + "/// <" + val1 + ">\n";
-      lines.forEach((l) => (descr += prefix + "/// " + l + "\n"));
+      lines.forEach((l) => (descr += prefix + "/// " + l.substring(1, 256) + "\n"));
       descr += prefix + "/// </" + val1 + ">";
       return descr;
     }
     return prefix + "/// <" + val1 + ">" + val2 + "</" + val1 + ">";
   }
 
+  //endregion
+
+  //region Pascal Helpers
   //endregion
 
   //region Pascal Helpers
@@ -162,12 +170,16 @@ export class IntfModelPrintor {
   public buildPascalProperties(o: AmiObj): unknown[] {
     return o.properties.map((propr) => {
       console.assert(propr.mapAmiObj instanceof AmiObj === (propr.type === propertyType.otMap), "Invalid otMap");
+      const objName = IntfModelPrintor.buildPascalObjName(o.name);
+      const proprName = IntfModelPrintor.buildPascalObjProprName(propr.name);
+      const fieldName = objName + "_" + proprName;
       return {
         ...propr,
-        proprName: IntfModelPrintor.buildPascalObjProprName(propr.name),
+        objName: objName,
+        fieldName: fieldName,
+        proprName: proprName,
         typeName: this.buildPascalObjProprTypeName(propr),
         elTypeName: this.buildPascalObjProprTypeName(propr, true),
-        fieldName: IntfModelPrintor.buildPascalObjName(o.name) + "_" + IntfModelPrintor.buildPascalObjProprName(propr.name),
         isPrimitive: propr.sampleTypes.size === 1 && isPrimitive(propr.type),
         isAmiObj: propr.mapAmiObj instanceof AmiObj,
         isArray: propr.type === propertyType.otList,

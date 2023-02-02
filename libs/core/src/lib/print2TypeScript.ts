@@ -1,6 +1,6 @@
 import * as Handlebars from "handlebars";
 import { IntfModelPrintor, intfModelPrintor } from "./intfPrintor";
-import { propertyType } from "./amiUtils";
+import { capitalizeFirstLetter, isPrimitive, propertyType } from "./amiUtils";
 import { AmiModel } from "./amiModel";
 import { AmiObj } from "./amiObj";
 import { AmiPropr } from "./amiPropr";
@@ -18,10 +18,10 @@ export class Print2TypeScript extends IntfModelPrintor implements intfModelPrint
    */
   private readonly tsTmplSrc = `
 {{~JDocDescr 0 description~}}
-export interface {{name}} {
+export interface {{intfName}} {
   {{#properties}}
   {{~JDocDescr 2 description~}}
-  {{~Indent 2~}} {{name}} {{decl}} {{type}};
+  {{~Indent 2~}} {{proprName}} {{proprDecl}} {{proprType}};
   {{/properties}}
   }
 `;
@@ -43,9 +43,6 @@ export interface {{name}} {
     this.outputFmt = "typescript";
     // add custom helpers to Handlebars
     Handlebars.registerHelper("JDocDescr", (indent: number, val: string) => Print2TypeScript.JDocDescr(indent, val));
-    Handlebars.registerHelper("Indent", (indent: number) => " ".repeat(indent));
-    Handlebars.registerHelper("Fill", (val: string, indent: number) => (indent > val.length ? val + " ".repeat(indent - val.length) : val));
-    Handlebars.registerHelper("json", (context) => JSON.stringify(context, null, 2));
     this.tsTmpl = Handlebars.compile(this.tsTmplSrc, { noEscape: true });
   }
 
@@ -55,7 +52,7 @@ export interface {{name}} {
    * @param {string} value
    * @returns {string}
    */
-  private static buildIntfName(value: string): string {
+  private static buildTSIntfName(value: string): string {
     const intfName = value.replaceAll(/[." -]/g, "_");
     return intfName.replaceAll(/___|__/g, "_");
   }
@@ -63,12 +60,12 @@ export interface {{name}} {
   /**
    * Convert `value` to a valid TS Property Name
    */
-  private static buildPropertyName(value: string): string {
+  private static buildTSProprName(value: string): string {
     const intfName = value.replaceAll(/[." -]/g, "_");
     return intfName.replaceAll(/___|__/g, "_");
   }
 
-  private static propertyType(property: propertyType): string {
+  private static TSType(property: propertyType): string {
     switch (property) {
       case propertyType.otBigInt:
       case propertyType.otFloat:
@@ -87,19 +84,8 @@ export interface {{name}} {
   //endregion
 
   //region Handlebars Scope Builder functions
-  private buildProperties(o: AmiObj): unknown[] {
-    return o.properties.map((propr) => {
-      return {
-        ...propr,
-        proprName: Print2TypeScript.buildPropertyName(propr.name),
-        decl: propr.required ? " :" : "?:",
-        type: this.buildPropertyType(propr),
-        examples: this.ami.addExamples ? propr.examples : "",
-      };
-    });
-  }
 
-  private buildPropertyType(propr: AmiPropr): string {
+  private buildTSProprType(propr: AmiPropr, isElem: boolean = false): string {
     if (propr.sampleTypes.size === 1) {
       switch (propr.type) {
         case propertyType.otBigInt:
@@ -114,23 +100,45 @@ export interface {{name}} {
     }
 
     if (propr.mapAmiObj instanceof AmiObj) {
-      return Print2TypeScript.buildIntfName(propr.mapAmiObj.name);
+      return Print2TypeScript.buildTSIntfName(propr.mapAmiObj.name);
     }
 
     if (propr.listAmiObj instanceof AmiObj) {
-      return Print2TypeScript.buildIntfName(propr.listAmiObj.name) + "Array";
+      const typeName = Print2TypeScript.buildTSIntfName(propr.listAmiObj.name);
+      return isElem ? typeName : `Array<${typeName}>`;
     }
 
-    if (propr.onlyPrimitives()) {
-      const names = Array.from(propr.sampleTypes).map((vt) => Print2TypeScript.propertyType(vt));
-      const uniques = [...new Set(names)];
-      return uniques.join(" | ");
+    if (propr.listTypes.size > 0) {
+      const typeNames = Array.from(propr.listTypes)
+        .map((vt) => Print2TypeScript.TSType(vt))
+        .join(" | ");
+      return isElem ? typeNames : `Array<${typeNames}>`;
+    }
+
+    if (propr.type === propertyType.otList) {
+      return isElem ? "any" : "Array<any>";
     }
 
     this.ami.cliLogger?.error(`Unknown type for property ${propr.name} in object ${propr.owner.name}`);
     return "any";
   }
 
+  private buildProperties(o: AmiObj): unknown[] {
+    return o.properties.map((propr) => {
+      return {
+        ...propr,
+        proprName: Print2TypeScript.buildTSProprName(propr.name),
+        proprType: this.buildTSProprType(propr),
+        elTypeName: this.buildTSProprType(propr, true),
+        proprDecl: propr.required ? " :" : "?:",
+        isPrimitive: propr.sampleTypes.size === 1 && isPrimitive(propr.type),
+        isAmiObj: propr.mapAmiObj instanceof AmiObj,
+        isArray: propr.type === propertyType.otList,
+        isArrayOfAmiObj: propr.listAmiObj instanceof AmiObj,
+        examples: this.ami.addExamples ? propr.examples : "",
+      };
+    });
+  }
   //endregion
 
   /**
@@ -138,7 +146,8 @@ export interface {{name}} {
    */
   private assignTemplateScope(o: AmiObj) {
     this.scope = {
-      name: Print2TypeScript.buildIntfName(o.name),
+      name: o.name,
+      intfName: Print2TypeScript.buildTSIntfName(o.name),
       properties: this.buildProperties(o),
       description: o.description,
     };
@@ -150,7 +159,7 @@ export interface {{name}} {
    */
   public printModel(): string {
     let ts = "";
-    this.ami.childObjs.reverse().forEach((o) => {
+    this.ami.childObjs.forEach((o) => {
       this.assignTemplateScope(o);
       ts = ts + this.tsTmpl(this.scope) + "\n";
     });
