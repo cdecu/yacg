@@ -195,6 +195,18 @@ Begin
         Result:=-1
       end end;
   End else
+  if (vt2 in [varNull,varEmpty]) then Begin
+    Case vt1 of
+      varString,varUString:Begin
+        // Empty String equal null
+        if (val2='') then
+          Result:= 0 else
+          Result:=+1
+        End;
+      else Begin
+        Result:=+1
+      end end;
+  End else  
   if (vt1=vt2) then Begin
     case vt1 of
     varByte,
@@ -552,12 +564,13 @@ Var i,len:Integer;
 begin
   Ptr:=nil;
   Result:=0;
-  len:=Length(f{{objName}}s);
-  for i:=0 to Pred(len) do Begin
-    if Obj1.CompareField(Field,Obj1,f{{objName}}s[i])=0 then Begin
-      Ptr:=@f{{objName}}s[i];
-      Inc(Result);
-    end end;
+  if Field in Obj1.AssignedFields then Begin
+    len:=Length(f{{objName}}s);
+    for i:=0 to Pred(len) do Begin
+      if Obj1.CompareField(Field,Obj1,f{{objName}}s[i])=0 then Begin
+        Ptr:=@f{{objName}}s[i];
+        Inc(Result);
+    end end end;
 end;
 
 function {{typeName}}s.AsSO(Const AllProps:Boolean=False):ISuperObject;
