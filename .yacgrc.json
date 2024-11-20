@@ -8,43 +8,43 @@
   "intfDescr": "Intf Descr",
   "files": [
     {
-      "file": "PPData/printers.json",
+      "file": "TestData/printers.json",
       "intfName": "PPPrinter"
     },
     {
-      "file": "PPData/store-printers.json",
+      "file": "TestData/store-printers.json",
       "intfName": "PPStorePrinter"
     },
     {
-      "file": "PPData/itemCategories.json",
+      "file": "TestData/itemCategories.json",
       "intfName": "PPItemCategory"
     },
     {
-      "file": "PPData/itemLevels.json",
+      "file": "TestData/itemLevels.json",
       "intfName": "PPItemLevel"
     },
     {
-      "file": "PPData/itemRanks.json",
+      "file": "TestData/itemRanks.json",
       "intfName": "PPItemRank"
     },
     {
-      "file": "PPData/itemPropositions.json",
+      "file": "TestData/itemPropositions.json",
       "intfName": "PPItemProposition"
     },
     {
-      "file": "PPData/items.json",
+      "file": "TestData/items.json",
       "intfName": "PPItem"
     },
     {
-      "file": "PPData/matrices.json",
+      "file": "TestData/matrices.json",
       "intfName": "PPMatrice"
     },
     {
-      "file": "PPData/Customers.json",
+      "file": "TestData/Customers.json",
       "intfName": "PPCustomer"
     },
     {
-      "file": "PPData/sales.json",
+      "file": "TestData/sales.json",
       "intfName": "PPSale"
     }
   ],
@@ -84,6 +84,9 @@
     },
     "rescue_printer_id": {
       "defaultType": "integer"
+    },
+    "uid": {
+      "defaultType": "string"
     }
   }
 }

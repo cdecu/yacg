@@ -21,7 +21,7 @@ export class Parser {
     this.src = f;
     try {
       f.json = JSON.parse(f.text);
-    } catch (err) {
+    } catch {
       // this.cliLogger?.info("< Parsing " + this.config.file);
       f.json = YAML.parse(f.text);
     }

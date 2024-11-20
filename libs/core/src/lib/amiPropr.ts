@@ -79,13 +79,13 @@ export class AmiPropr {
       this.sampleTypes.delete(propertyType.otInteger);
       this.sampleTypes.delete(propertyType.otBigInt);
       if (this.sampleTypes.size === 1) {
-        this.type = this.sampleTypes.values().next().value;
+        this.type = this.sampleTypes.values().next().value || propertyType.otUnknown;
       }
     }
     if (this.sampleTypes.has(propertyType.otBigInt)) {
       this.sampleTypes.delete(propertyType.otInteger);
       if (this.sampleTypes.size === 1) {
-        this.type = this.sampleTypes.values().next().value;
+        this.type = this.sampleTypes.values().next().value || propertyType.otUnknown;
       }
     }
 
@@ -95,7 +95,7 @@ export class AmiPropr {
     // Property has only one type
     if (this.sampleTypes.size === 0) {
       this?.ami?.cliLogger?.warn(`No sample values for ${this.owner.name}.${this.name}`);
-      const dico = this.ami.config.dico[this.name];
+      const dico = this.ami.config?.dico[this.name];
       if (dico?.defaultType) {
         const vt = Str2Type(dico.defaultType);
         if (vt !== propertyType.otUnknown) {

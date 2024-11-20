@@ -1,0 +1,25 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  border: blue solid 1px;
+
+  .output-header {
+    height: 1.5rem;
+    .fmt {
+      @apply bg-white dark:bg-black;
+      border: none;
+      color: #2086d7;
+    }
+    .fmt:focus {
+      border: none;
+      outline: none;
+    }
+  }
+
+  .output-editor {
+    flex: 1;
+    .editor {
+      height: 100%;
+    }
+  }
+}

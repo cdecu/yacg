@@ -1,6 +1,5 @@
 import assert = require("assert");
-import { isJson, valType } from "../lib/amiUtils";
-import { propertyType } from "../lib/intfPropr";
+import { isJson, valType, propertyType } from "../lib/amiUtils";
 
 describe("valType", function () {
   it("should return `objectTypes` for valid Value|JSON", function () {

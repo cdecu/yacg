@@ -1,19 +1,22 @@
-import * as Handlebars from "handlebars";
-import { IntfModelPrintor, intfModelPrintor } from "./intfPrintor";
-import { AmiModel } from "./amiModel";
-import { AmiObj } from "./amiObj";
-import { isPrimitive, propertyType } from "./amiUtils";
-import { ConfigIntf } from "./amiConfig";
+import * as Handlebars from 'handlebars';
+import { IntfModelPrintor, intfModelPrintor } from './intfPrintor';
+import { AmiModel } from './amiModel';
+import { AmiObj } from './amiObj';
+import { propertyType } from './amiUtils';
+import { ConfigIntf } from './amiConfig';
 
 /**
  * Print to pascal using SuperObject lib.
  */
-export class Print2PascalSO extends IntfModelPrintor implements intfModelPrintor {
+export class Print2PascalSO
+  extends IntfModelPrintor
+  implements intfModelPrintor
+{
   //region properties
   /**
    * Handlebars Template text
    */
-  private readonly IntfTmplSrc = `{{~DelphiDescr 2 "summary" description}}{{~cr}}  
+  private readonly IntfTmplSrc = `{{~DelphiDescr 2 "summary" description}}{{~cr}}
 {{~Indent 2}}{{typeName}}Field = (
     {{#properties}}
     {{fieldName}}{{#if @last}}{{else}},{{/if}}
@@ -22,20 +25,20 @@ export class Print2PascalSO extends IntfModelPrintor implements intfModelPrintor
   {{typeName}}Fields = Set of {{typeName}}Field;
 
 {{#properties}}
-  {{#if isArray}} 
+  {{#if isArray}}
     {{~Indent 2~}}{{typeName}} = Array of {{elTypeName}};
-  {{/if}}  
+  {{/if}}
 {{/properties}}
 
   {{typeName}}Ptr = ^{{typeName}};
   {{typeName}} = Record
-  public   
+  public
     const RequiredFields : {{typeName}}Fields = [
       {{#requiredProperties}}
       {{fieldName}}{{#if @last}}{{else}},{{/if}}
       {{/requiredProperties}}
       ];
-  private   
+  private
     {{#properties}}
     {{~Indent 4~}}f{{Fill proprName 20}}: {{typeName}};
     {{/properties}}
@@ -44,22 +47,22 @@ export class Print2PascalSO extends IntfModelPrintor implements intfModelPrintor
     fTagKey               : String;
     fTagObj               : TObject;
     fTagGUID              : TGUID;
-    
+
     {{#properties}}
     {{#if needGetter}}
     function Get_{{proprName}}:{{typeName}};
-    {{/if}}    
+    {{/if}}
     procedure Set_{{proprName}}(Const {{#if asConstRef}}[ref] {{/if}} Value:{{typeName}});
     {{/properties}}
 
-  public   
+  public
     AssignedFields : {{typeName}}Fields;
-    
+
     ///<summary>Is Value a Property Field</summary>
     class function Name2Field(Const Value:String;Out Field:{{typeName}}Field):Boolean;static;
     ///<summary>Is Propr Required</summary>
     class function ProprRequired(Const Value:String):Boolean;static;
-    
+
     ///<summary>Clear all properties</summary>
     procedure Clear;
     ///<summary>Compare</summary>
@@ -67,27 +70,27 @@ export class Print2PascalSO extends IntfModelPrintor implements intfModelPrintor
     ///<summary>Compare</summary>
     Class function Compare(Const [ref] Obj1,Obj2:{{typeName}}):{{typeName}}Fields;overload;static;
     ///<summary>Compare Propr Value</summary>
-    Class function CompareField(Const Field:{{typeName}}Field;Const [ref] Obj1,Obj2:{{typeName}}):Integer;static; 
-    
+    Class function CompareField(Const Field:{{typeName}}Field;Const [ref] Obj1,Obj2:{{typeName}}):Integer;static;
+
     ///<summary>Assign from Object</summary>
     function Assign(const [ref] aSource: {{typeName}};Const OnlyFields:{{typeName}}Fields):{{typeName}}Fields;
-    
+
     ///<summary>Assign from JSON Object</summary>
     function AssignSO(const aSource: ISuperObject):{{typeName}}Fields;
-    
+
     ///<summary>Build JSON Object</summary>
     function AsSO(Const AllProps:Boolean=False):ISuperObject;
-    
-  public   
+
+  public
     {{#properties}}
     {{~DelphiDescr 4 "summary" description}}
     {{~DelphiDescr 4 "examples" examples}}
     /// required : {{required}}
     {{#if needGetter}}
     property {{proprName}} : {{typeName}} read Get_{{proprName}} write Set_{{proprName}};
-    {{else}}    
+    {{else}}
     property {{proprName}} : {{typeName}} read f{{proprName}} write Set_{{proprName}};
-    {{/if}}    
+    {{/if}}
     {{/properties}}
 
     /// <summary>Runtime properties</summary>
@@ -98,7 +101,7 @@ export class Print2PascalSO extends IntfModelPrintor implements intfModelPrintor
     property TagObj  : TObject   read fTagObj  write fTagObj;
     /// <summary>Runtime properties</summary>
     property TagGUID : TGUID     read fTagGUID write fTagGUID;
-    
+
   end;
 
   {{#if isRoot}}
@@ -110,8 +113,8 @@ export class Print2PascalSO extends IntfModelPrintor implements intfModelPrintor
     function GetCount:Integer;
     /// <summary>Getter</summary>
     function GetItem(Const Idx:Integer):{{typeName}}Ptr;
-  
-  public 
+
+  public
     /// <summary>Destructor</summary>
     Destructor Destroy;override;
     /// <summary>Destructor</summary>
@@ -142,14 +145,14 @@ export class Print2PascalSO extends IntfModelPrintor implements intfModelPrintor
     property Items[Const Idx:Integer] : {{typeName}}Ptr read GetItem;default;
   end;
   {{/if}}
-  
+
 `;
 
   /**
    * Handlebars Template text
    */
-  private readonly ImplConstDefTmplSrc = `  
-Const 
+  private readonly ImplConstDefTmplSrc = `
+Const
   {{#properties}}
   _JSON_{{proprName}}_ = '{{name}}';
   {{/properties}}
@@ -158,7 +161,7 @@ Const
   /**
    * Handlebars Template text
    */
-  private readonly ImplUtilsTmplSrc = `  
+  private readonly ImplUtilsTmplSrc = `
 {{#if isRoot}}
 {______________________________________________________________________________}
 {______________________________________________________________________________}
@@ -186,7 +189,7 @@ Begin
         Result:=0
         end;
       varString,varUString:Begin
-        // Empty String equal null 
+        // Empty String equal null
         if (val2='') then
           Result:= 0 else
           Result:=-1
@@ -206,7 +209,7 @@ Begin
       else Begin
         Result:=+1
       end end;
-  End else  
+  End else
   if (vt1=vt2) then Begin
     case vt1 of
     varByte,
@@ -235,13 +238,13 @@ Begin
     Result:=CompareStr(val1,val2);
 end;
 
-{{/if}}    
+{{/if}}
 `;
 
   /**
    * Handlebars Template text
    */
-  private readonly ImplTmplSrc = `  
+  private readonly ImplTmplSrc = `
 {______________________________________________________________________________}
 {______________________________________________________________________________}
 {{DelphiDescr 0 "summary" description}}
@@ -252,12 +255,12 @@ Begin
   {{#if (Equal proprName name)}}
   if SameText(_JSON_{{proprName}}_,Value) then Begin
     Field:={{../typeName}}Field.{{fieldName}};
-    Exit(True); 
+    Exit(True);
     end;
   {{else}}
-  if SameText(_JSON_{{proprName}}_,Value) or SameText('{{proprName}}',Value) then Begin 
+  if SameText(_JSON_{{proprName}}_,Value) or SameText('{{proprName}}',Value) then Begin
     Field:={{../typeName}}Field.{{fieldName}};
-    Exit(True); 
+    Exit(True);
     end;
   {{/if}}
   {{/properties}}
@@ -281,9 +284,9 @@ Begin
   {{/properties}}
 end;
 
-Class function {{typeName}}.CompareField(Const Field:{{typeName}}Field;Const [ref] Obj1,Obj2:{{typeName}}):Integer; 
-Begin 
-  Case Field of 
+Class function {{typeName}}.CompareField(Const Field:{{typeName}}Field;Const [ref] Obj1,Obj2:{{typeName}}):Integer;
+Begin
+  Case Field of
   {{#properties}}
   {{../typeName}}Field.{{fieldName}}:Begin
     {{propCompare .}};
@@ -292,7 +295,7 @@ Begin
   else Begin
     Assert(False);
     result:=0;
-  end end; 
+  end end;
 end;
 
 function {{typeName}}.Compare(Const [ref] aSource:{{typeName}}):{{typeName}}Fields;
@@ -302,9 +305,9 @@ Begin
   if (CompareField({{../typeName}}Field.{{fieldName}},Self,aSource)<>0) then Begin
     Include(Result,{{../typeName}}Field.{{fieldName}});
     end;
-    
+
   {{/properties}}
-end;  
+end;
 Class function {{typeName}}.Compare(Const [ref] Obj1,Obj2:{{typeName}}):{{typeName}}Fields;
 Begin
   Result:=[];
@@ -312,19 +315,19 @@ Begin
   if (CompareField({{../typeName}}Field.{{fieldName}},Obj1,Obj2)<>0) then Begin
     Include(Result,{{../typeName}}Field.{{fieldName}});
     end;
-    
+
   {{/properties}}
-end;  
+end;
 
 function {{typeName}}.Assign(const [ref] aSource: {{typeName}};Const OnlyFields:{{typeName}}Fields):{{typeName}}Fields;
 Begin
   Result:=[];
   {{#properties}}
-  if ({{../typeName}}Field.{{fieldName}} in OnlyFields) or (OnlyFields=[]) then Begin 
-    if (CompareField({{../typeName}}Field.{{fieldName}},Self,aSource)<>0) then 
+  if ({{../typeName}}Field.{{fieldName}} in OnlyFields) or (OnlyFields=[]) then Begin
+    if (CompareField({{../typeName}}Field.{{fieldName}},Self,aSource)<>0) then
       Include(Result,{{../typeName}}Field.{{fieldName}});
-    if {{../typeName}}Field.{{fieldName}} in aSource.AssignedFields then 
-      Include(AssignedFields,{{../typeName}}Field.{{fieldName}}) else 
+    if {{../typeName}}Field.{{fieldName}} in aSource.AssignedFields then
+      Include(AssignedFields,{{../typeName}}Field.{{fieldName}}) else
       Exclude(AssignedFields,{{../typeName}}Field.{{fieldName}});
     {{#if isPrimitive}}
     Self.f{{proprName}}:=aSource.f{{proprName}};
@@ -332,35 +335,35 @@ Begin
     {{#if isAmiObj}}
     Self.f{{proprName}}.Assign(Value);
     {{else}}
-    {{#if isArray}}  
+    {{#if isArray}}
     Begin
     Var i,len:Integer;
     len:=Length(aSource.f{{proprName}});
     SetLength(Self.f{{proprName}},len);
     if (len>0) then Begin
       for i:=0 to Pred(len) do
-        {{#if isArrayOfAmiObj}}  
+        {{#if isArrayOfAmiObj}}
         Self.f{{proprName}}[i].Assign(aSource.f{{proprName}}[i],[]);
         {{else}}
         Self.f{{proprName}}[i]  := aSource.f{{proprName}}[i];
         {{/if}}
-    end end;      
+    end end;
     {{else}}
     Self.f{{proprName}}:=aSource.f{{proprName}};
     {{/if}}
     {{/if}}
     {{/if}}
     end;
-  
+
   {{/properties}}
 end;
 
 function {{typeName}}.AssignSO(const aSource: ISuperObject):{{typeName}}Fields;
 Begin
   Result:=[];
-  Self.Clear; 
+  Self.Clear;
   {{#properties}}
-  Begin 
+  Begin
     var obj:ISuperObject;
     obj := aSource.O[_JSON_{{proprName}}_];
     if (obj<>nil) then Begin
@@ -369,7 +372,7 @@ Begin
         Include(AssignedFields,{{../typeName}}Field.{{fieldName}});
         {{propAssign .}};
   end end end;
-        
+
   {{/properties}}
 end;
 
@@ -381,10 +384,10 @@ Begin
   o:=Result.AsObject;
 
   {{#properties}}
-  if (AllProps) or ( {{../typeName}}Field.{{fieldName}} in AssignedFields) then Begin   
+  if (AllProps) or ( {{../typeName}}Field.{{fieldName}} in AssignedFields) then Begin
     {{proprAsSO .}};
     end;
-    
+
   {{/properties}}
 end;
 
@@ -399,7 +402,7 @@ Begin
   Include(AssignedFields,{{../typeName}}Field.{{fieldName}});
   Self.f{{proprName}}.Assign(Value);
   {{else}}
-  {{#if isArray}}  
+  {{#if isArray}}
   Begin
   Var i,len:Integer;
   len:=Length(Value);
@@ -407,12 +410,12 @@ Begin
   if (len>0) then Begin
     Include(AssignedFields,{{../typeName}}Field.{{fieldName}});
     for i:=0 to Pred(len) do
-      {{#if isArrayOfAmiObj}}  
+      {{#if isArrayOfAmiObj}}
       Self.f{{proprName}}[i].Assign(Value[i],[]);
       {{else}}
       Self.f{{proprName}} := Value[i];
       {{/if}}
-    end end;      
+    end end;
   {{else}}
   Include(AssignedFields,{{../typeName}}Field.{{fieldName}});
   Self.f{{proprName}}:=Value;
@@ -437,17 +440,17 @@ begin
 end;
 function {{typeName}}s.GetCount:Integer;
 Begin
-  Result:=Length(f{{objName}}s);  
+  Result:=Length(f{{objName}}s);
 end;
 function {{typeName}}s.GetItem(Const Idx:Integer):{{typeName}}Ptr;
 Var len:Integer;
 Begin
   len:=Length(f{{objName}}s);
-  if (Idx>=0) and (Idx<len) then Begin  
+  if (Idx>=0) and (Idx<len) then Begin
     Result:=@f{{objName}}s[Idx];
-  end else 
+  end else
     Result:=nil;
-end;    
+end;
 procedure {{typeName}}s.RAZTags;
 var Ptr: {{typeName}}Ptr;
     i,len:Integer;
@@ -465,7 +468,7 @@ begin
     Ptr.f{{proprName}}.fTagKey:='';
     Ptr.f{{proprName}}.fTagObj:= nil;
     RAZGuid(Ptr.f{{proprName}}.fTagGuid);
-    {{/if}}    
+    {{/if}}
     {{#if isArrayOfAmiObj}}
     Begin
     Var i1,len1:Integer;
@@ -476,8 +479,8 @@ begin
       Ptr.f{{proprName}}[i1].fTagObj:=nil;
       RAZGuid(Ptr.f{{proprName}}[i1].fTagGuid);
     end end;
-    {{/if}}        
-    {{/properties}}    
+    {{/if}}
+    {{/properties}}
     end;
 end;
 procedure {{typeName}}s.Assign(const so: ISuperObject);
@@ -591,21 +594,37 @@ End;
 `;
   //endregion
 
-  constructor(public readonly ami: AmiModel, public readonly config: ConfigIntf) {
-    super(ami, config);
-    this.fileExt = ".pas";
-    this.outputFmt = "pascal-so";
+  constructor(public readonly a: AmiModel, public readonly c?: ConfigIntf) {
+    super(a, c || a.config);
+    this.fileExt = '.pas';
+    this.outputFmt = 'pascal-so';
     // add custom helpers to Handlebars
-    Handlebars.registerHelper("DelphiDescr", (indent: number, val1: string, val2: string) => Print2PascalSO.DelphiDescr(indent, val1, val2));
-    Handlebars.registerHelper("Indent", (indent: number) => " ".repeat(indent));
-    Handlebars.registerHelper("Fill", (val: string, fill: number) => (fill > val.length ? val + " ".repeat(fill - val.length) : val));
-    Handlebars.registerHelper("propClear", (propr, fill) => this.propClear(propr, fill));
-    Handlebars.registerHelper("propCompare", (propr) => this.propCompare(propr));
-    Handlebars.registerHelper("propAssign", (propr) => this.propAssign(propr));
-    Handlebars.registerHelper("proprAsSO", (propr) => this.proprAsSO(propr));
-    Handlebars.registerHelper("Equal", (v1, v2) => v1 == v2);
-    Handlebars.registerHelper("cr", () => "\n");
-    Handlebars.registerHelper("json", (context) => JSON.stringify(context, (name, val) => (name === "ami" || name === "owner" ? null : val), 2));
+    Handlebars.registerHelper(
+      'DelphiDescr',
+      (indent: number, val1: string, val2: string) =>
+        Print2PascalSO.DelphiDescr(indent, val1, val2)
+    );
+    Handlebars.registerHelper('Indent', (indent: number) => ' '.repeat(indent));
+    Handlebars.registerHelper('Fill', (val: string, fill: number) =>
+      fill > val.length ? val + ' '.repeat(fill - val.length) : val
+    );
+    Handlebars.registerHelper('propClear', (propr, fill) =>
+      this.propClear(propr, fill)
+    );
+    Handlebars.registerHelper('propCompare', (propr) =>
+      this.propCompare(propr)
+    );
+    Handlebars.registerHelper('propAssign', (propr) => this.propAssign(propr));
+    Handlebars.registerHelper('proprAsSO', (propr) => this.proprAsSO(propr));
+    Handlebars.registerHelper('Equal', (v1, v2) => v1 == v2);
+    Handlebars.registerHelper('cr', () => '\n');
+    Handlebars.registerHelper('json', (context) =>
+      JSON.stringify(
+        context,
+        (name, val) => (name === 'ami' || name === 'owner' ? null : val),
+        2
+      )
+    );
   }
 
   //region Template Helpers
@@ -614,15 +633,15 @@ End;
     switch (type) {
       case propertyType.otBigInt:
       case propertyType.otInteger:
-        return "AsInteger";
+        return 'AsInteger';
       case propertyType.otFloat:
-        return "AsDouble";
+        return 'AsDouble';
       case propertyType.otBoolean:
-        return "AsBoolean";
+        return 'AsBoolean';
       case propertyType.otString:
-        return "AsString";
+        return 'AsString';
       default:
-        return "AsString";
+        return 'AsString';
     }
   }
 
@@ -630,15 +649,15 @@ End;
     switch (type) {
       case propertyType.otBigInt:
       case propertyType.otInteger:
-        return "I";
+        return 'I';
       case propertyType.otFloat:
-        return "D";
+        return 'D';
       case propertyType.otBoolean:
-        return "B";
+        return 'B';
       case propertyType.otString:
-        return "S";
+        return 'S';
       default:
-        return "O";
+        return 'O';
     }
   }
   //endregion
@@ -647,31 +666,34 @@ End;
   /**
    * Build the properties default value.
    */
-  private propClear(propr: any, fill: number = 25): string {
-    const filler = fill > propr.proprName.length ? " ".repeat(fill - propr.proprName.length) : " ";
+  private propClear(propr: any, fill = 25): string {
+    const filler =
+      fill > propr.proprName.length
+        ? ' '.repeat(fill - propr.proprName.length)
+        : ' ';
 
     if (propr.sampleTypes.size === 1) {
       switch (propr.type) {
         case propertyType.otBigInt:
         case propertyType.otFloat:
         case propertyType.otInteger:
-          return "f" + propr.proprName + filler + ":= 0";
+          return 'f' + propr.proprName + filler + ':= 0';
         case propertyType.otString:
-          return "f" + propr.proprName + filler + ":= ''";
+          return 'f' + propr.proprName + filler + ":= ''";
         case propertyType.otBoolean:
-          return "f" + propr.proprName + filler + ":= False";
+          return 'f' + propr.proprName + filler + ':= False';
       }
     }
 
     if (propr.isAmiObj) {
-      return "f" + propr.proprName + ".Clear";
+      return 'f' + propr.proprName + '.Clear';
     }
 
     if (propr.isArray) {
-      return "SetLength(" + "f" + propr.proprName + ", 0)";
+      return 'SetLength(' + 'f' + propr.proprName + ', 0)';
     }
 
-    return "f" + propr.proprName + filler + ":= NULL";
+    return 'f' + propr.proprName + filler + ':= NULL';
   }
 
   /**
@@ -720,7 +742,7 @@ End;
       Var i:Integer;
       for i:=0 to Pred(Len1) do Begin
         Result:=${CompareFct}(obj1.f${propr.proprName}[i],obj2.f${propr.proprName}[i]);
-        if Result<>0 then 
+        if Result<>0 then
           Break;
       end end`;
     }
@@ -734,7 +756,7 @@ End;
       Var i:Integer;
       for i:=0 to Pred(Len1) do Begin
         Result:=CompareVariant(obj1.f${propr.proprName}[i],obj2.f${propr.proprName}[i]);
-        if Result<>0 then 
+        if Result<>0 then
           Break;
       end end`;
     }
@@ -753,7 +775,9 @@ End;
         case propertyType.otInteger:
         case propertyType.otBigInt:
         case propertyType.otFloat:
-          return `self.f${propr.proprName} := obj.${Print2PascalSO.type2SOFct(propr.type)}`;
+          return `self.f${propr.proprName} := obj.${Print2PascalSO.type2SOFct(
+            propr.type
+          )}`;
       }
     }
 
@@ -763,7 +787,7 @@ End;
 
     if (propr.isArrayOfAmiObj) {
       return `if (ObjectIsType(obj,stArray)) then Begin
-          var i:Integer; 
+          var i:Integer;
           SetLength(Self.f${propr.proprName},obj.AsArray.Length);
           for i:=0 to Pred(obj.AsArray.Length) do
             Self.f${propr.proprName}[i].AssignSO(obj.AsArray[i]);
@@ -772,14 +796,14 @@ End;
 
     if (propr.isArray) {
       return `if (ObjectIsType(obj,stArray)) then Begin
-          var i:Integer; 
+          var i:Integer;
           SetLength(Self.f${propr.proprName},obj.AsArray.Length);
           for i:=0 to Pred(obj.AsArray.Length) do
             Self.f${propr.proprName}[i] := obj.AsArray[i];
           end`;
     }
 
-    return "self.f" + propr.proprName + " := ObjAsVariant(obj)";
+    return 'self.f' + propr.proprName + ' := ObjAsVariant(obj)';
   }
 
   private proprAsSO(propr: any): string {
@@ -790,35 +814,48 @@ End;
         case propertyType.otInteger:
         case propertyType.otBigInt:
         case propertyType.otFloat:
-          return "o." + Print2PascalSO.type2SOPropr(propr.type) + "[_JSON_" + propr.proprName + "_] := f" + propr.proprName;
+          return (
+            'o.' +
+            Print2PascalSO.type2SOPropr(propr.type) +
+            '[_JSON_' +
+            propr.proprName +
+            '_] := f' +
+            propr.proprName
+          );
       }
     }
 
     if (propr.isAmiObj) {
-      return "o.O[_JSON_" + propr.proprName + "_] := f" + propr.proprName + ".AsSO(AllProps)";
+      return (
+        'o.O[_JSON_' +
+        propr.proprName +
+        '_] := f' +
+        propr.proprName +
+        '.AsSO(AllProps)'
+      );
     }
 
     if (propr.isArrayOfAmiObj) {
-      return `Begin 
+      return `Begin
     var p:ISuperObject;
     var i,len:Integer;
     len:=Length(f${propr.proprName});
     p:=TSuperObject.Create(stArray);
     for i:=0 to Pred(len) do
       p.AsArray.Add(f${propr.proprName}[i].AsSO(AllProps));
-    o.O[_JSON_${propr.proprName}_] := p 
+    o.O[_JSON_${propr.proprName}_] := p
     end`;
     }
 
     if (propr.isArray) {
-      return `Begin 
+      return `Begin
     var p:ISuperObject;
     var i,len:Integer;
     len:=Length(f${propr.proprName});
     p:=TSuperObject.Create(stArray);
     for i:=0 to Pred(len) do
       p.AsArray.Add(SuperObject.SObj(f${propr.proprName}[i]));
-    o.O[_JSON_${propr.proprName}_] := p 
+    o.O[_JSON_${propr.proprName}_] := p
     end`;
     }
 
@@ -845,40 +882,43 @@ End;
    * printModel return the typescript code declaring ...
    */
   public printModel(): string {
-    let ts = "Unit " + this.ami.name + ";\n\n";
-    ts += "Interface\n\n";
-    ts += "Uses System.Classes, System.Math, System.SysUtils, System.Variants, SuperObject,rmx.GUID;\n\n";
+    let ts = 'Unit ' + this.ami.name + ';\n\n';
+    ts += 'Interface\n\n';
+    ts +=
+      'Uses System.Classes, System.Math, System.SysUtils, System.Variants, SuperObject,rmx.GUID;\n\n';
 
-    ts += "Type\n";
+    ts += 'Type\n';
     let tsIntfTmpl = Handlebars.compile(this.IntfTmplSrc, { noEscape: true });
     this.ami.childObjs.reverse().forEach((o) => {
       this.assignTemplateScope(o);
       ts += tsIntfTmpl(this.scope);
-      ts += "\n";
+      ts += '\n';
     });
 
-    ts += "Implementation\n\n";
+    ts += 'Implementation\n\n';
 
-    tsIntfTmpl = Handlebars.compile(this.ImplConstDefTmplSrc, { noEscape: true });
+    tsIntfTmpl = Handlebars.compile(this.ImplConstDefTmplSrc, {
+      noEscape: true,
+    });
     this.ami.childObjs.reverse().forEach((o) => {
       this.assignTemplateScope(o);
       ts += tsIntfTmpl(this.scope);
-      ts += "\n";
+      ts += '\n';
     });
     tsIntfTmpl = Handlebars.compile(this.ImplUtilsTmplSrc, { noEscape: true });
     this.ami.childObjs.reverse().forEach((o) => {
       this.assignTemplateScope(o);
       ts += tsIntfTmpl(this.scope);
-      ts += "\n";
+      ts += '\n';
     });
     tsIntfTmpl = Handlebars.compile(this.ImplTmplSrc, { noEscape: true });
     this.ami.childObjs.reverse().forEach((o) => {
       this.assignTemplateScope(o);
       ts += tsIntfTmpl(this.scope);
-      ts += "\n";
+      ts += '\n';
     });
 
-    ts += "end.\n";
+    ts += 'end.\n';
 
     return ts;
   }

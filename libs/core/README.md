@@ -1,12 +1,11 @@
-# Yet Another Code Generator Core Library
-
-- Keep code Browser Compatible :( 
-  - Ex do not load Handlebars templates from file system
-
+# core
 
 This library was generated with [Nx](https://nx.dev).
 
+## Building
+
+Run `nx build core` to build the library.
+
+## Running unit tests
+
 Run `nx test core` to execute the unit tests via [Jest](https://jestjs.io).
-Run `nx lint core` to execute the lint via [ESLint](https://eslint.org/).
-
-

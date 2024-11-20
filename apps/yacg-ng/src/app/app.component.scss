@@ -1,0 +1,24 @@
+:host {
+  display: block;
+
+  main {
+    min-height: 66vh;
+    display: grid;
+    grid-template-areas:
+      'input'
+      'output';
+    grid-template-columns: auto;
+    @screen sm {
+      grid-template-areas: 'input output';
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .input {
+      grid-area: input;
+    }
+
+    .output {
+      grid-area: output;
+    }
+  }
+}

@@ -1,25 +1,52 @@
-import * as assert from "assert";
-import { convertTSIntfName, convertTSPropertyName, Print2TypeScript } from "../lib/print2TypeScript";
+import * as assert from 'assert';
+import { Print2TypeScript } from '../lib/print2TypeScript';
+import { IntfModelPrintor } from '../lib/intfPrintor';
+import { AmiModelBase } from '../lib/amiModel';
+import { ConfigIntf } from '../lib/amiConfig';
 
-describe("TS Printor", function () {
-  it("convertTSIntfName", function () {
-    assert.strictEqual(convertTSIntfName("test  ts  Intf"), "test_ts_Intf");
-    assert.strictEqual(convertTSIntfName("test.ts.Intf"), "test_ts_Intf");
+describe('Pascal Printor', function () {
+  it('buildPascalObjName', function () {
+    assert.strictEqual(
+      IntfModelPrintor.buildPascalObjName('test  ts  Intf'),
+      'Test_ts_Intf'
+    );
+    assert.strictEqual(
+      IntfModelPrintor.buildPascalObjName('test.ts.Intf'),
+      'Test_ts_Intf'
+    );
   });
-  it("convertTSPropertyName", function () {
-    assert.strictEqual(convertTSPropertyName("test  ts  Intf"), "test_ts_Intf");
-    assert.strictEqual(convertTSPropertyName("test.ts.Intf"), "test_ts_Intf");
+  it('buildPascalObjProprName', function () {
+    assert.strictEqual(
+      IntfModelPrintor.buildPascalObjProprName('test  ts  Propr'),
+      'test_ts_Propr'
+    );
+    assert.strictEqual(
+      IntfModelPrintor.buildPascalObjProprName('test.ts.Propr'),
+      'test_ts_Propr'
+    );
   });
 });
 
-test("TSPrintor", () => {
-  const ami = {
+test('TSPrintor', () => {
+  class TestTSPrintorAmiModel extends AmiModelBase {
+    ami: unknown;
+  }
+
+  const ami: TestTSPrintorAmiModel = {
     ami: {},
-    name: "test",
-    description: "test",
+    name: 'test',
+    description: 'test',
     sampleSize: 0,
+    addExamples: true,
+    config: {} as ConfigIntf,
+    childObjs: [],
   };
+
   ami.ami = ami;
-  const p = new Print2TypeScript(ami, {});
-  expect(() => p.printModel(ami)).toThrow();
+  const config: ConfigIntf = {
+    outputFmt: 'someFormat',
+    dico: {},
+  };
+  const p = new Print2TypeScript(ami, config);
+  expect(() => p.printModel()).toThrow();
 });

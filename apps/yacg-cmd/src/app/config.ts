@@ -104,7 +104,7 @@ export class Config implements ConfigIntf {
       .help(true);
 
     cmdline.parse();
-    cmdline.exitProcess(false).epilog("copyright 2022");
+    cmdline.exitProcess(false).epilog("copyright 2024");
 
     return cmdline.argv;
   }

@@ -80,7 +80,7 @@ export function isJson(value: unknown): propertyType {
     if (Number.isInteger(n)) return propertyType.otInteger;
     // TODO detect objectTypes.otBigInt;
     return propertyType.otFloat;
-  } catch (e) {
+  } catch {
     return propertyType.otString;
   }
 }

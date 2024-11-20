@@ -3,58 +3,56 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/yacg-cmd/src",
   "projectType": "application",
+  "tags": [],
   "targets": {
     "build": {
-      "executor": "@nrwl/webpack:webpack",
+      "executor": "@nx/esbuild:esbuild",
       "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
       "options": {
+        "platform": "node",
         "outputPath": "dist/apps/yacg-cmd",
+        "format": ["cjs"],
+        "bundle": false,
         "main": "apps/yacg-cmd/src/main.ts",
         "tsConfig": "apps/yacg-cmd/tsconfig.app.json",
         "assets": ["apps/yacg-cmd/src/assets"],
-        "target": "node",
-        "compiler": "tsc"
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
       },
       "configurations": {
+        "development": {},
         "production": {
-          "optimization": true,
-          "extractLicenses": true,
-          "inspect": false,
-          "fileReplacements": [
-            {
-              "replace": "apps/yacg-cmd/src/environments/environment.ts",
-              "with": "apps/yacg-cmd/src/environments/environment.prod.ts"
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
             }
-          ]
+          }
         }
       }
     },
     "serve": {
-      "executor": "@nrwl/node:node",
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
       "options": {
-        "buildTarget": "yacg-cmd:build"
+        "buildTarget": "yacg-cmd:build",
+        "runBuildTargetDependencies": false
       },
       "configurations": {
+        "development": {
+          "buildTarget": "yacg-cmd:build:development"
+        },
         "production": {
           "buildTarget": "yacg-cmd:build:production"
         }
       }
-    },
-    "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/yacg-cmd/**/*.ts"]
-      }
-    },
-    "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/apps/yacg-cmd"],
-      "options": {
-        "jestConfig": "apps/yacg-cmd/jest.config.ts",
-        "passWithNoTests": true
-      }
     }
-  },
-  "tags": []
+  }
 }

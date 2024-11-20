@@ -12,7 +12,7 @@ export class AmiObj {
   /**
    * Just initialize name,type
    */
-  constructor(public readonly ami: AmiModel, public readonly owner: AmiObj | AmiModel, public name: string = "", public description: string = "") {}
+  constructor(public readonly ami: AmiModel, public readonly owner: AmiObj | AmiModel, public name = "", public description = "") {}
 
   /**
    * Clear

@@ -1,25 +1,39 @@
-import { AmiObj } from "./amiObj";
-import { propertyType, valType } from "./amiUtils";
-import { logHelper } from "./intfLogger";
-import { ConfigIntf, InputFileIntf } from "./amiConfig";
+import { AmiObj } from './amiObj';
+import { propertyType, valType } from './amiUtils';
+import { logHelper } from './intfLogger';
+import { ConfigIntf, InputFileIntf } from './amiConfig';
 
 /**
  * Abstract Model Info
  */
-export class AmiModel {
-  public src!: InputFileIntf;
-  public name = "";
-  public description = "";
+export class AmiModelBase {
+  public name = '';
+  public description = '';
   public sampleSize = 0;
   public addExamples = true;
-  public readonly rootObj: AmiObj;
   public readonly childObjs: AmiObj[] = [];
+  /**
+   * Abstract Model Info constructor
+   */
+  constructor(
+    public readonly config: ConfigIntf,
+    public readonly cliLogger?: logHelper
+  ) {}
+}
+
+/**
+ * Abstract Model Info
+ */
+export class AmiModel extends AmiModelBase {
+  public src!: InputFileIntf;
+  public readonly rootObj: AmiObj;
   private json: any[] = [];
 
   /**
    * Abstract Model Info constructor
    */
-  constructor(public readonly config: ConfigIntf, public readonly cliLogger: logHelper) {
+  constructor(public readonly c: ConfigIntf, public readonly l?: logHelper) {
+    super(c, l);
     this.rootObj = new AmiObj(this, this);
   }
 
@@ -42,18 +56,18 @@ export class AmiModel {
     if (Array.isArray(this.src.json)) {
       this.sampleSize = this.src.json.length;
       this.rootObj.sampleSize = this.sampleSize;
-      if (!this.sampleSize) throw "Empty Array";
+      if (!this.sampleSize) throw 'Empty Array';
       this.json = this.src.json;
-    } else if (typeof this.src.json === "object") {
+    } else if (typeof this.src.json === 'object') {
       this.rootObj.sampleSize = 1;
       this.json.push(this.src.json);
       this.sampleSize = 1;
     } else {
       // invalid JSON
-      throw "Unsupported Source JSON";
+      throw 'Unsupported Source JSON';
     }
 
-    if (this.json.length === 0) throw "Empty Source JSON";
+    if (this.json.length === 0) throw 'Empty Source JSON';
 
     this.parseJSON();
   }
@@ -64,12 +78,16 @@ export class AmiModel {
   private parseJSON(): void {
     // loop on source JSON
     this.json.forEach((j) => {
-      if (j !== undefined && j !== null && typeof j === "object") {
-        Object.entries(j).forEach(([key, val]) => this.addObjPropr(this.rootObj, key, val));
+      if (j !== undefined && j !== null && typeof j === 'object') {
+        Object.entries(j).forEach(([key, val]) =>
+          this.addObjPropr(this.rootObj, key, val)
+        );
       }
     });
     // Detect properties type from sample values
-    this.childObjs.forEach((obj) => obj.properties.forEach((prop) => prop.detectType()));
+    this.childObjs.forEach((obj) =>
+      obj.properties.forEach((prop) => prop.detectType())
+    );
   }
 
   /**
@@ -82,10 +100,15 @@ export class AmiModel {
     switch (propr.type) {
       case propertyType.otMap:
         // Remove trailing "s"
-        const elName = propr.name.replace(/s$/, "");
+        const elName = propr.name.replace(/s$/, '');
         // recurse on child object
-        const o = this.addObjMapPropr(propr.owner, `${propr.owner.name}.${elName}`);
-        Object.entries(val).forEach(([key, val]) => this.addObjPropr(o, key, val));
+        const o = this.addObjMapPropr(
+          propr.owner,
+          `${propr.owner.name}.${elName}`
+        );
+        Object.entries(val).forEach(([key, val]) =>
+          this.addObjPropr(o, key, val)
+        );
         propr.mapAmiObj = o;
         break;
       case propertyType.otList:
@@ -96,9 +119,14 @@ export class AmiModel {
           switch (itemType) {
             case propertyType.otMap:
               // Remove trailing "s"
-              const elName = propr.name.replace(/s$/, "");
-              const o = this.addObjMapPropr(propr.owner, `${propr.owner.name}.${elName}`);
-              Object.entries(item).forEach(([key, val]) => this.addObjPropr(o, key, val));
+              const elName = propr.name.replace(/s$/, '');
+              const o = this.addObjMapPropr(
+                propr.owner,
+                `${propr.owner.name}.${elName}`
+              );
+              Object.entries(item).forEach(([key, val]) =>
+                this.addObjPropr(o, key, val)
+              );
               propr.listAmiObj = o;
               break;
             default:
@@ -122,7 +150,7 @@ export class AmiModel {
       return found;
     }
 
-    const childObject = new AmiObj(this, owner, name, "");
+    const childObject = new AmiObj(this, owner, name, '');
     this.childObjs.push(childObject);
     return childObject;
   }

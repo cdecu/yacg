@@ -1,0 +1,47 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  border: #FFF045 solid 1px;
+  @screen sm {
+    flex-direction: row;
+  }
+
+  details {
+    margin: 20px auto 20px;
+    min-width: 10rem;
+    summary{
+    }
+
+    ul {
+      @apply ml-8 mr-8 grid gap-2;
+      p {
+        @apply text-center mt-1 mb-1;
+      }
+      li {
+        @apply col-auto justify-center flex flex-col space-x-5 border dark:border-gray-600;
+        @apply hover:bg-indigo-900;
+        padding: 2px;
+        height: 44px;
+        a {
+          @apply flex flex-row m-auto space-x-2;
+          span {
+            @apply justify-center flex flex-col;
+            height: 44px;
+          }
+          img {
+            height: 32px;
+            margin: auto;
+          }
+        }
+      }
+    }
+
+    pre {
+      background-color: #474646ff;
+      color: white;
+      font-size: small;
+      font-family: monospace;
+    }
+
+  }
+}

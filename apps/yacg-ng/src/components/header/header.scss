@@ -1,0 +1,42 @@
+:host {
+  display: block;
+  border: #00CDD7 solid 1px;
+
+  header {
+    display: grid;
+    grid-template-areas:
+      'lLogo'
+      'cTitle'
+      'rBtn';
+    grid-template-columns: auto;
+    @screen sm {
+      grid-template-areas: 'lLogo cTitle rBtn';
+      grid-template-columns: auto 1fr auto;
+    }
+
+    .lLogo {
+      grid-area: lLogo;
+      margin: auto;
+      padding: 2px;
+      @screen sm {
+        margin: 0;
+      }
+    }
+
+    .cTitle {
+      grid-area: cTitle;
+      margin: auto;
+    }
+
+    .rBtn {
+      grid-area: rBtn;
+      margin: auto;
+      padding: 5px;
+      @screen sm {
+        margin: auto 5px;
+        padding: 0;
+      }
+      @apply sm:m-auto;
+    }
+  }
+}
