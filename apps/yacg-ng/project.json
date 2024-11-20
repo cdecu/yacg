@@ -50,20 +50,8 @@
           "optimization": false,
           "extractLicenses": false,
           "sourceMap": true
-        }
-      },
-      "defaultConfiguration": "production"
-    },
-    "serve": {
-      "executor": "@angular-devkit/build-angular:dev-server",
-      "configurations": {
-        "production": {
-          "buildTarget": "yacg-ng:build:production"
         },
-        "development": {
-          "buildTarget": "yacg-ng:build:development"
-        },
-        "gh-pages": {
+      "gh-pages": {
           "budgets": [
             {
               "type": "initial",
@@ -78,6 +66,18 @@
           ],
           "outputHashing": "all",
           "baseHref": "https://cdecu.github.io/yacg/"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "yacg-ng:build:production"
+        },
+        "development": {
+          "buildTarget": "yacg-ng:build:development"
         }
       },
       "defaultConfiguration": "development"
