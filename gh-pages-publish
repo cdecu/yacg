@@ -20,9 +20,11 @@ mkdir docs
 mv dist/apps/yacg-ng/browser/*  docs/
 
 echo "-Commit to GitHub"
+set +e
 git add docs
 git commit -m "Published"
 git push
+set -e
 
 echo "-Back to main branch"
 rm -rf dist
