@@ -10,13 +10,13 @@ git merge --squash main
 
 echo "-Build"
 set +e
-mkdir docs
-rm -R docs/*
-mv -R dist/apps/yacg-ng/browser/*
+rm -rf docs
+rm -rf dist
 set -e
 nx run yacg-ng:build:gh-pages
 
 echo "-Move to Docs"
+mkdir docs
 mv dist/apps/yacg-ng/browser/*  docs/
 
 echo "-Commit to GitHub"
