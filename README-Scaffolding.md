@@ -68,7 +68,7 @@ ncu -u
 ```
 
 
-## Inspiration to read 
+## Inspiration to read
 - https://github.com/Himenon/openapi-typescript-code-generator
 - https://ts-ast-viewer.com/
 
@@ -90,4 +90,18 @@ ncu -u
 - https://danielcaballero88.github.io/
 - https://github.com/angular-schule/angular-cli-ghpages/tree/main
 - https://ej2.syncfusion.com/angular/demos/#/fluent2/range-slider/orientation
-- 
+-
+
+``- Deplay to Github Pages
+```bash
+git fetch 
+git status 
+git checkout gh-pages
+git merge --squash main
+nx run yacg-ng:build:gh-pages
+rm -Rv docs/*
+mv -v  dist/apps/yacg-ng/browser/*  docs/
+git add docs
+git commit -m "Published"
+git push 
+```

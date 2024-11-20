@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, effect, Injectable, signal } from '@angular/core';
 import {
   AmiModel,
   InputFileIntf,
@@ -9,7 +9,6 @@ import {
 } from '@yacg/core';
 import * as YAML from 'yaml';
 import { BehaviorSubject, debounceTime, filter, map } from 'rxjs';
-import { toSignal } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root',
@@ -21,24 +20,48 @@ export class ParserService {
   public selectedFmt = signal('typescript');
 
   // input data to be parsed;
-  public $input_data: BehaviorSubject<string> = new BehaviorSubject(`
-[
+  public $input_data: BehaviorSubject<string> = new BehaviorSubject(
+    `[
 {"id": 1,  "name": "item 1"},
 {"id": 2, "name": "item 2" }
 ]
-`);
+`
+  );
 
   // input data converted
+  public output_data = signal('');
   public $output_data = this.$input_data.pipe(
     debounceTime(1000),
     filter((x) => !!x),
-    map((x) => this.parse(x))
+    map((x) => {
+      const d = this.parse(x);
+      // console.log('output_data', d);
+      this.output_data.set(d);
+    })
   );
-  public output_data = toSignal(this.$output_data);
+
+  public data = computed(() => {
+    return this.output_data();
+  });
 
   constructor() {
     // TODO load dico from assets file or ...
     this.ami = new AmiModel({ dico: {}, outputFmt: 'typescript' });
+
+    // watch for changes in selected format
+    effect(
+      () => {
+        // console.log(`The fmt is: ${this.selectedFmt()}`);
+        const d = this.parse(this.$input_data.value);
+        this.output_data.set(d);
+      },
+      { allowSignalWrites: true }
+    );
+
+    // subscribe
+    this.$output_data.subscribe(() => {
+      // console.log('output_data', this.output_data());
+    });
   }
 
   private parse(x: string): string {
