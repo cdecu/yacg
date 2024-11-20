@@ -6,7 +6,9 @@ git fetch
 git pull
 git status
 git checkout gh-pages
-git merge --squash main
+#git merge --squash main
+git merge --strategy-option=theirs -m "Publish"  main
+
 
 echo "-Build"
 set +e
