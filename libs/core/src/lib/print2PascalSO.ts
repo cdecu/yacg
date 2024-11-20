@@ -1,6 +1,6 @@
 import * as Handlebars from 'handlebars';
 import { IntfModelPrintor, intfModelPrintor } from './intfPrintor';
-import { AmiModel, AmiModelBase } from './amiModel';
+import { AmiModelBase } from './amiModel';
 import { AmiObj } from './amiObj';
 import { propertyType } from './amiUtils';
 import { ConfigIntf } from './amiConfig';

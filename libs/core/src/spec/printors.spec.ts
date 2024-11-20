@@ -1,9 +1,11 @@
 import * as assert from 'assert';
-import { Print2TypeScript } from '../lib/print2TypeScript';
-import { IntfModelPrintor } from '../lib/intfPrintor';
-import { AmiModelBase } from '../lib/amiModel';
-import { ConfigIntf } from '../lib/amiConfig';
-import { Print2PascalSO } from '@yacg/core';
+import {
+  Print2PascalSO,
+  Print2TypeScript,
+  IntfModelPrintor,
+  AmiModelBase,
+  ConfigIntf,
+} from '../index';
 
 describe('Pascal Printor', function () {
   it('buildPascalObjName', function () {
