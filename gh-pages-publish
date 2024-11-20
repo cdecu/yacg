@@ -1,0 +1,15 @@
+#!/bin/bash
+echo "Publishing to gh-pages"
+git fetch
+git pull
+git status
+git checkout gh-pages
+git merge --squash main
+nx run yacg-ng:build:gh-pages
+rm -Rv docs/*
+mv -v  dist/apps/yacg-ng/browser/*  docs/
+git add docs
+git commit -m "Published"
+git push
+
+

@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "cmd": "nx build yacg-cmd && node dist/apps/yacg-cmd/main.js"
+    "cmd": "nx build yacg-cmd && node dist/apps/yacg-cmd/main.js",
+    "gh-pages": "./gh-pages-publish"
   },
   "private": true,
   "dependencies": {
