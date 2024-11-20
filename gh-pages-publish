@@ -1,15 +1,32 @@
 #!/bin/bash
 echo "Publishing to gh-pages"
+set -e
+echo "-Change to branch gh-pages"
 git fetch
 git pull
 git status
 git checkout gh-pages
 git merge --squash main
-nx run yacg-ng:build:gh-pages
+
+echo "-Build"
 rm -Rv docs/*
+mv -Rv dist/apps/yacg-ng/browser/*
+nx run yacg-ng:build:gh-pages
+
+echo "-Move to Docs"
 mv -v  dist/apps/yacg-ng/browser/*  docs/
+
+echo "-Commit to GitHub"
 git add docs
 git commit -m "Published"
 git push
+
+echo "-Back to main branch"
+git checkout -- *
+git checkout main
+git pull
+git status
+
+
 
 

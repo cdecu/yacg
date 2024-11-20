@@ -68,7 +68,7 @@ ncu -u
 ```
 
 
-## Inspiration to read 
+## Inspiration to read
 - https://github.com/Himenon/openapi-typescript-code-generator
 - https://ts-ast-viewer.com/
 
@@ -90,7 +90,7 @@ ncu -u
 - https://danielcaballero88.github.io/
 - https://github.com/angular-schule/angular-cli-ghpages/tree/main
 - https://ej2.syncfusion.com/angular/demos/#/fluent2/range-slider/orientation
-- 
+-
 
 ``- Deplay to Github Pages
 ```bash
@@ -105,4 +105,3 @@ git add docs
 git commit -m "Published"
 git push 
 ```
-
