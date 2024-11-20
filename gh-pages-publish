@@ -29,7 +29,3 @@ git checkout -- *
 git checkout main
 git pull
 git status
-
-
-
-
