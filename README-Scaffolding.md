@@ -85,3 +85,9 @@ ncu -u
 - https://ngx-codemirror.vercel.app/
 - https://les-enovateurs.com/
 - https://tsquery-playground.firebaseapp.com/
+
+- https://github.com/dalenguyen/dalenguyen.github.io
+- https://danielcaballero88.github.io/
+- https://github.com/angular-schule/angular-cli-ghpages/tree/main
+- https://ej2.syncfusion.com/angular/demos/#/fluent2/range-slider/orientation
+- 
