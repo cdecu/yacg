@@ -3,6 +3,7 @@ import { Print2TypeScript } from '../lib/print2TypeScript';
 import { IntfModelPrintor } from '../lib/intfPrintor';
 import { AmiModelBase } from '../lib/amiModel';
 import { ConfigIntf } from '../lib/amiConfig';
+import { Print2PascalSO } from '@yacg/core';
 
 describe('Pascal Printor', function () {
   it('buildPascalObjName', function () {
@@ -42,11 +43,41 @@ test('TSPrintor', () => {
     childObjs: [],
   };
 
-  ami.ami = ami;
   const config: ConfigIntf = {
-    outputFmt: 'someFormat',
+    outputFmt: 'typescript',
     dico: {},
   };
+
+  ami.ami = ami;
+  // Load some data from TestData
+
   const p = new Print2TypeScript(ami, config);
-  expect(() => p.printModel()).toThrow();
+  assert.strictEqual(p.printModel(), '');
+});
+
+test('PascalPrintor', () => {
+  class TestPascalPrintorAmiModel extends AmiModelBase {
+    ami: unknown;
+  }
+
+  const ami: TestPascalPrintorAmiModel = {
+    ami: {},
+    name: 'test',
+    description: 'test',
+    sampleSize: 0,
+    addExamples: true,
+    config: {} as ConfigIntf,
+    childObjs: [],
+  };
+
+  const config: ConfigIntf = {
+    outputFmt: 'typescript',
+    dico: {},
+  };
+
+  ami.ami = ami;
+  // Load some data from TestData
+
+  const p = new Print2PascalSO(ami, config);
+  expect(p.printModel().startsWith('Unit')).toBe(true);
 });
