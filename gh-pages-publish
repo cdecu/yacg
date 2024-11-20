@@ -27,10 +27,6 @@ git push
 set -e
 
 echo "-Back to main branch"
-rm -rf dist
-rm -rf docs
-rm -rf tmp
-git checkout -- *
 git checkout main
 git pull
 git status
