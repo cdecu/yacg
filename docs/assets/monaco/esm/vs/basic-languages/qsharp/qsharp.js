@@ -1,6 +1,6 @@
 /*!-----------------------------------------------------------------------------
  * Copyright (c) Microsoft Corporation. All rights reserved.
- * Version: 0.50.0(c321d0fbecb50ab8a5365fa1965476b0ae63fc87)
+ * Version: 0.52.0(f6dc0eb8fce67e57f6036f4769d92c1666cdf546)
  * Released under the MIT license
  * https://github.com/microsoft/monaco-editor/blob/main/LICENSE.txt
  *-----------------------------------------------------------------------------*/
@@ -34,12 +34,15 @@ var language = {
   keywords: [
     "namespace",
     "open",
+    "import",
+    "export",
     "as",
     "operation",
     "function",
     "body",
     "adjoint",
     "newtype",
+    "struct",
     "controlled",
     "if",
     "elif",
@@ -140,7 +143,6 @@ var language = {
     "stackalloc",
     "static",
     "string",
-    "struct",
     "switch",
     "this",
     "throw",
@@ -198,6 +200,7 @@ var language = {
     "^=",
     ":",
     "::",
+    ".",
     "..",
     "==",
     "...",
@@ -235,6 +238,7 @@ var language = {
     "w/="
   ],
   namespaceFollows: ["namespace", "open"],
+  importsFollows: ["import"],
   symbols: /[=><!~?:&|+\-*\/\^%@._]+/,
   escapes: /\\[\s\S]/,
   // The main tokenizer for our languages
@@ -248,6 +252,10 @@ var language = {
             "@namespaceFollows": {
               token: "keyword.$0",
               next: "@namespace"
+            },
+            "@importsFollows": {
+              token: "keyword.$0",
+              next: "@imports"
             },
             "@typeKeywords": "type",
             "@keywords": "keyword",
@@ -269,7 +277,7 @@ var language = {
       // delimiter: after number because of .\d floats
       [/[;,.]/, "delimiter"],
       // strings
-      //[/"([^"\\]|\\.)*$/, 'string.invalid' ],  // non-teminated string
+      //[/"([^"\\]|\\.)*$/, 'string.invalid' ],  // non-terminated string
       [/"/, { token: "string.quote", bracket: "@open", next: "@string" }]
     ],
     string: [
@@ -280,7 +288,15 @@ var language = {
     namespace: [
       { include: "@whitespace" },
       [/[A-Za-z]\w*/, "namespace"],
-      [/[\.=]/, "delimiter"],
+      [/[\.]/, "delimiter"],
+      ["", "", "@pop"]
+    ],
+    imports: [
+      { include: "@whitespace" },
+      [/[A-Za-z]\w*(?=\.)/, "namespace"],
+      [/[A-Za-z]\w*/, "identifier"],
+      [/\*/, "wildcard"],
+      [/[\.,]/, "delimiter"],
       ["", "", "@pop"]
     ],
     whitespace: [

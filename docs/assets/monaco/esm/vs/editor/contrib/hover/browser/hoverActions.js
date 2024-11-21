@@ -8,7 +8,7 @@ import { EditorAction } from '../../../browser/editorExtensions.js';
 import { Range } from '../../../common/core/range.js';
 import { EditorContextKeys } from '../../../common/editorContextKeys.js';
 import { GotoDefinitionAtPositionEditorContribution } from '../../gotoSymbol/browser/link/goToDefinitionAtPosition.js';
-import { HoverController } from './hoverController.js';
+import { ContentHoverController } from './contentHoverController2.js';
 import { HoverVerbosityAction } from '../../../common/languages.js';
 import * as nls from '../../../../nls.js';
 import './hover.css';
@@ -64,11 +64,11 @@ export class ShowOrFocusHoverAction extends EditorAction {
         if (!editor.hasModel()) {
             return;
         }
-        const controller = HoverController.get(editor);
+        const controller = ContentHoverController.get(editor);
         if (!controller) {
             return;
         }
-        const focusArgument = args === null || args === void 0 ? void 0 : args.focus;
+        const focusArgument = args?.focus;
         let focusOption = HoverFocusBehavior.FocusIfVisible;
         if (Object.values(HoverFocusBehavior).includes(focusArgument)) {
             focusOption = focusArgument;
@@ -114,7 +114,7 @@ export class ShowDefinitionPreviewHoverAction extends EditorAction {
         });
     }
     run(accessor, editor) {
-        const controller = HoverController.get(editor);
+        const controller = ContentHoverController.get(editor);
         if (!controller) {
             return;
         }
@@ -156,7 +156,7 @@ export class ScrollUpHoverAction extends EditorAction {
         });
     }
     run(accessor, editor) {
-        const controller = HoverController.get(editor);
+        const controller = ContentHoverController.get(editor);
         if (!controller) {
             return;
         }
@@ -186,7 +186,7 @@ export class ScrollDownHoverAction extends EditorAction {
         });
     }
     run(accessor, editor) {
-        const controller = HoverController.get(editor);
+        const controller = ContentHoverController.get(editor);
         if (!controller) {
             return;
         }
@@ -216,7 +216,7 @@ export class ScrollLeftHoverAction extends EditorAction {
         });
     }
     run(accessor, editor) {
-        const controller = HoverController.get(editor);
+        const controller = ContentHoverController.get(editor);
         if (!controller) {
             return;
         }
@@ -246,7 +246,7 @@ export class ScrollRightHoverAction extends EditorAction {
         });
     }
     run(accessor, editor) {
-        const controller = HoverController.get(editor);
+        const controller = ContentHoverController.get(editor);
         if (!controller) {
             return;
         }
@@ -277,7 +277,7 @@ export class PageUpHoverAction extends EditorAction {
         });
     }
     run(accessor, editor) {
-        const controller = HoverController.get(editor);
+        const controller = ContentHoverController.get(editor);
         if (!controller) {
             return;
         }
@@ -308,7 +308,7 @@ export class PageDownHoverAction extends EditorAction {
         });
     }
     run(accessor, editor) {
-        const controller = HoverController.get(editor);
+        const controller = ContentHoverController.get(editor);
         if (!controller) {
             return;
         }
@@ -339,7 +339,7 @@ export class GoToTopHoverAction extends EditorAction {
         });
     }
     run(accessor, editor) {
-        const controller = HoverController.get(editor);
+        const controller = ContentHoverController.get(editor);
         if (!controller) {
             return;
         }
@@ -370,7 +370,7 @@ export class GoToBottomHoverAction extends EditorAction {
         });
     }
     run(accessor, editor) {
-        const controller = HoverController.get(editor);
+        const controller = ContentHoverController.get(editor);
         if (!controller) {
             return;
         }
@@ -387,8 +387,12 @@ export class IncreaseHoverVerbosityLevel extends EditorAction {
         });
     }
     run(accessor, editor, args) {
-        var _a;
-        (_a = HoverController.get(editor)) === null || _a === void 0 ? void 0 : _a.updateMarkdownHoverVerbosityLevel(HoverVerbosityAction.Increase, args === null || args === void 0 ? void 0 : args.index, args === null || args === void 0 ? void 0 : args.focus);
+        const hoverController = ContentHoverController.get(editor);
+        if (!hoverController) {
+            return;
+        }
+        const index = args?.index !== undefined ? args.index : hoverController.focusedHoverPartIndex();
+        hoverController.updateHoverVerbosityLevel(HoverVerbosityAction.Increase, index, args?.focus);
     }
 }
 export class DecreaseHoverVerbosityLevel extends EditorAction {
@@ -401,7 +405,11 @@ export class DecreaseHoverVerbosityLevel extends EditorAction {
         });
     }
     run(accessor, editor, args) {
-        var _a;
-        (_a = HoverController.get(editor)) === null || _a === void 0 ? void 0 : _a.updateMarkdownHoverVerbosityLevel(HoverVerbosityAction.Decrease, args === null || args === void 0 ? void 0 : args.index, args === null || args === void 0 ? void 0 : args.focus);
+        const hoverController = ContentHoverController.get(editor);
+        if (!hoverController) {
+            return;
+        }
+        const index = args?.index !== undefined ? args.index : hoverController.focusedHoverPartIndex();
+        ContentHoverController.get(editor)?.updateHoverVerbosityLevel(HoverVerbosityAction.Decrease, index, args?.focus);
     }
 }
