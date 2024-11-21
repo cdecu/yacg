@@ -6,7 +6,6 @@ import { Resources } from '../components/resources/resources';
 import { Footer } from '../components/footer/footer';
 
 @Component({
-  standalone: true,
   imports: [Header, Input, Output, Resources, Footer],
   selector: 'app-root',
   templateUrl: './app.component.html',

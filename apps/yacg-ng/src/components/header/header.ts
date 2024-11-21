@@ -4,7 +4,6 @@ import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'yacg-header',
-  standalone: true,
   imports: [MdoButtonModule, NgOptimizedImage],
   templateUrl: './header.html',
   styleUrl: './header.scss',

@@ -6,7 +6,6 @@ import { NgForOf } from '@angular/common';
 
 @Component({
   selector: 'yacg-output',
-  standalone: true,
   imports: [EditorComponent, FormsModule, NgForOf],
   templateUrl: './output.html',
   styleUrl: './output.scss',

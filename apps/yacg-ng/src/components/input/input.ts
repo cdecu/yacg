@@ -5,7 +5,6 @@ import { ParserService } from '../../app/parser.service';
 
 @Component({
   selector: 'yacg-input',
-  standalone: true,
   imports: [EditorComponent, FormsModule],
   templateUrl: './input.html',
   styleUrl: './input.scss',
