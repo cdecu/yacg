@@ -133,14 +133,13 @@ export class AmiPropr {
       return;
     }
 
-    // Property has many types
-    this.detectComplexTypes();
-    return;
+    // Property has many types. TODO check
+    // this.detectComplexTypes();
   }
 
   /**
    * Try to find enum ex: CardColor : SPADE, HEART, DIAMOND, CLUB.
-   * So type is converted to an Enum or a Type Alias.
+   * So the type is converted to an Enum or a Type Alias.
    */
   private detectEnumType() {
     // console.log(`EnumType ${this.ami.name}.${this.owner.name}.${this.name} : Type ${this.type}`);

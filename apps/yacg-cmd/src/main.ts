@@ -12,7 +12,7 @@ class CliLogger implements logHelper {
 
   private doLog(message, level: LogLevel = LogLevel.Info): void {
     if (level <= this.config.logLevel) {
-      if (typeof message === "string" || typeof message === "string") {
+      if (typeof message === "string") {
         switch (level) {
           case LogLevel.Error:
             console.error(message);
