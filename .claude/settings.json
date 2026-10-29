@@ -12,20 +12,11 @@
   },
   "sandbox": {
     "filesystem": {
-      "allowRead": [
-        "/tmp/.nx",
-        "~/.nx"
-      ],
-      "allowWrite": [
-        "/tmp/.nx",
-        "~/.nx"
-      ]
+      "allowRead": ["/tmp/.nx", "~/.nx"],
+      "allowWrite": ["/tmp/.nx", "~/.nx"]
     },
     "network": {
-      "allowUnixSockets": [
-        "/tmp/.nx",
-        "~/.nx"
-      ]
+      "allowUnixSockets": ["/tmp/.nx", "~/.nx"]
     }
   }
 }
