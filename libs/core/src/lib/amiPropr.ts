@@ -21,7 +21,11 @@ export class AmiPropr {
    * Just initialize name.
    * TODO I dont like to pass the logger everywhere but ...
    */
-  constructor(public readonly ami: AmiModel, public readonly owner: AmiObj, public readonly name: string) {}
+  constructor(
+    public readonly ami: AmiModel,
+    public readonly owner: AmiObj,
+    public readonly name: string,
+  ) {}
 
   /**
    * only Primitive Types

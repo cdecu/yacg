@@ -1,17 +1,19 @@
+@reference "../../styles.css";
+
 :host {
   display: block;
   padding-bottom: 5px;
-  border-bottom: #00CDD7 solid 1px;
+  border-bottom: #00cdd7 solid 1px;
 
   header {
     display: grid;
     grid-template-areas:
-      'lLogo'
-      'cTitle'
-      'rBtn';
+      "lLogo"
+      "cTitle"
+      "rBtn";
     grid-template-columns: auto;
-    @screen sm {
-      grid-template-areas: 'lLogo cTitle rBtn';
+    @media (width >= 40rem) {
+      grid-template-areas: "lLogo cTitle rBtn";
       grid-template-columns: auto 1fr auto;
     }
 
@@ -19,7 +21,7 @@
       grid-area: lLogo;
       margin: auto;
       padding: 2px;
-      @screen sm {
+      @media (width >= 40rem) {
         margin: 0;
       }
     }
@@ -33,7 +35,7 @@
       grid-area: rBtn;
       margin: auto;
       padding: 5px;
-      @screen sm {
+      @media (width >= 40rem) {
         margin: auto 5px;
         padding: 0;
       }

@@ -7,15 +7,16 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@angular-devkit/build-angular:application",
+      "executor": "@angular/build:application",
       "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
       "options": {
         "outputPath": "dist/apps/yacg-ng",
         "index": "apps/yacg-ng/src/index.html",
         "browser": "apps/yacg-ng/src/main.ts",
         "polyfills": [],
         "tsConfig": "apps/yacg-ng/tsconfig.app.json",
-        "inlineStyleLanguage": "scss",
+        "inlineStyleLanguage": "css",
         "assets": [
           {
             "glob": "**/*",
@@ -27,7 +28,7 @@
             "output": "/assets/monaco/"
           }
         ],
-        "styles": ["apps/yacg-ng/src/styles.scss"],
+        "styles": ["apps/yacg-ng/src/styles.css"],
         "scripts": []
       },
       "configurations": {
@@ -51,7 +52,7 @@
           "extractLicenses": false,
           "sourceMap": true
         },
-      "gh-pages": {
+        "gh-pages": {
           "budgets": [
             {
               "type": "initial",
@@ -67,11 +68,12 @@
           "outputHashing": "all",
           "baseHref": "https://cdecu.github.io/yacg/"
         }
-      },
-      "defaultConfiguration": "production"
+      }
     },
     "serve": {
-      "executor": "@angular-devkit/build-angular:dev-server",
+      "executor": "@angular/build:dev-server",
+      "defaultConfiguration": "development",
+      "continuous": true,
       "configurations": {
         "production": {
           "buildTarget": "yacg-ng:build:production"
@@ -80,23 +82,15 @@
           "buildTarget": "yacg-ng:build:development"
         }
       },
-      "defaultConfiguration": "development"
-    },
-    "extract-i18n": {
-      "executor": "@angular-devkit/build-angular:extract-i18n",
-      "options": {
-        "buildTarget": "yacg-ng:build"
+      "readyWhen": {
+        "signal": true
       }
     },
     "lint": {
-      "executor": "@nx/eslint:lint"
-    },
-    "serve-static": {
-      "executor": "@nx/web:file-server",
+      "executor": "nx:run-commands",
       "options": {
-        "buildTarget": "yacg-ng:build",
-        "staticFilePath": "dist/apps/yacg-ng/browser",
-        "spa": true
+        "command": "vp lint apps/yacg-ng",
+        "cwd": "."
       }
     }
   }

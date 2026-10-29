@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+/* You can add global styles to this file, and also import other style files */
+body {
+  @apply bg-white text-black;
+  @apply dark:bg-black dark:text-gray-200;
+}

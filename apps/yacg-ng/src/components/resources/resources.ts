@@ -1,11 +1,11 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { NgOptimizedImage } from '@angular/common';
+import { ChangeDetectionStrategy, Component } from "@angular/core";
+import { NgOptimizedImage } from "@angular/common";
 
 @Component({
-  selector: 'yacg-resources',
+  selector: "yacg-resources",
   imports: [NgOptimizedImage],
-  templateUrl: './resources.html',
-  styleUrl: './resources.scss',
+  templateUrl: "./resources.html",
+  styleUrl: "./resources.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Resources {}

@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { MdoButtonModule } from '@ctrl/ngx-github-buttons';
-import { NgOptimizedImage } from '@angular/common';
+import { ChangeDetectionStrategy, Component } from "@angular/core";
+import { MdoButtonModule } from "@ctrl/ngx-github-buttons";
+import { NgOptimizedImage } from "@angular/common";
 
 @Component({
-  selector: 'yacg-header',
+  selector: "yacg-header",
   imports: [MdoButtonModule, NgOptimizedImage],
-  templateUrl: './header.html',
-  styleUrl: './header.scss',
+  templateUrl: "./header.html",
+  styleUrl: "./header.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Header {}

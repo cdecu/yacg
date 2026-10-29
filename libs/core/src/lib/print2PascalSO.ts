@@ -1,17 +1,14 @@
-import * as Handlebars from 'handlebars';
-import { IntfModelPrintor, intfModelPrintor } from './intfPrintor';
-import { AmiModelBase } from './amiModel';
-import { AmiObj } from './amiObj';
-import { propertyType } from './amiUtils';
-import { ConfigIntf } from './amiConfig';
+import * as Handlebars from "handlebars";
+import { IntfModelPrintor, intfModelPrintor } from "./intfPrintor";
+import { AmiModelBase } from "./amiModel";
+import { AmiObj } from "./amiObj";
+import { propertyType } from "./amiUtils";
+import { ConfigIntf } from "./amiConfig";
 
 /**
  * Print to pascal using SuperObject lib.
  */
-export class Print2PascalSO
-  extends IntfModelPrintor
-  implements intfModelPrintor
-{
+export class Print2PascalSO extends IntfModelPrintor implements intfModelPrintor {
   //region properties
   /**
    * Handlebars Template text
@@ -594,36 +591,29 @@ End;
 `;
   //endregion
 
-  constructor(public readonly a: AmiModelBase, public readonly c?: ConfigIntf) {
+  constructor(
+    public readonly a: AmiModelBase,
+    public readonly c?: ConfigIntf,
+  ) {
     super(a, c || a.config);
-    this.fileExt = '.pas';
-    this.outputFmt = 'pascal-so';
+    this.fileExt = ".pas";
+    this.outputFmt = "pascal-so";
     // add custom helpers to Handlebars
-    Handlebars.registerHelper(
-      'DelphiDescr',
-      (indent: number, val1: string, val2: string) =>
-        Print2PascalSO.DelphiDescr(indent, val1, val2)
+    Handlebars.registerHelper("DelphiDescr", (indent: number, val1: string, val2: string) =>
+      Print2PascalSO.DelphiDescr(indent, val1, val2),
     );
-    Handlebars.registerHelper('Indent', (indent: number) => ' '.repeat(indent));
-    Handlebars.registerHelper('Fill', (val: string, fill: number) =>
-      fill > val.length ? val + ' '.repeat(fill - val.length) : val
+    Handlebars.registerHelper("Indent", (indent: number) => " ".repeat(indent));
+    Handlebars.registerHelper("Fill", (val: string, fill: number) =>
+      fill > val.length ? val + " ".repeat(fill - val.length) : val,
     );
-    Handlebars.registerHelper('propClear', (propr, fill) =>
-      this.propClear(propr, fill)
-    );
-    Handlebars.registerHelper('propCompare', (propr) =>
-      this.propCompare(propr)
-    );
-    Handlebars.registerHelper('propAssign', (propr) => this.propAssign(propr));
-    Handlebars.registerHelper('proprAsSO', (propr) => this.proprAsSO(propr));
-    Handlebars.registerHelper('Equal', (v1, v2) => v1 == v2);
-    Handlebars.registerHelper('cr', () => '\n');
-    Handlebars.registerHelper('json', (context) =>
-      JSON.stringify(
-        context,
-        (name, val) => (name === 'ami' || name === 'owner' ? null : val),
-        2
-      )
+    Handlebars.registerHelper("propClear", (propr, fill) => this.propClear(propr, fill));
+    Handlebars.registerHelper("propCompare", (propr) => this.propCompare(propr));
+    Handlebars.registerHelper("propAssign", (propr) => this.propAssign(propr));
+    Handlebars.registerHelper("proprAsSO", (propr) => this.proprAsSO(propr));
+    Handlebars.registerHelper("Equal", (v1, v2) => v1 == v2);
+    Handlebars.registerHelper("cr", () => "\n");
+    Handlebars.registerHelper("json", (context) =>
+      JSON.stringify(context, (name, val) => (name === "ami" || name === "owner" ? null : val), 2),
     );
   }
 
@@ -633,15 +623,15 @@ End;
     switch (type) {
       case propertyType.otBigInt:
       case propertyType.otInteger:
-        return 'AsInteger';
+        return "AsInteger";
       case propertyType.otFloat:
-        return 'AsDouble';
+        return "AsDouble";
       case propertyType.otBoolean:
-        return 'AsBoolean';
+        return "AsBoolean";
       case propertyType.otString:
-        return 'AsString';
+        return "AsString";
       default:
-        return 'AsString';
+        return "AsString";
     }
   }
 
@@ -649,15 +639,15 @@ End;
     switch (type) {
       case propertyType.otBigInt:
       case propertyType.otInteger:
-        return 'I';
+        return "I";
       case propertyType.otFloat:
-        return 'D';
+        return "D";
       case propertyType.otBoolean:
-        return 'B';
+        return "B";
       case propertyType.otString:
-        return 'S';
+        return "S";
       default:
-        return 'O';
+        return "O";
     }
   }
   //endregion
@@ -667,33 +657,30 @@ End;
    * Build the properties default value.
    */
   private propClear(propr: any, fill = 25): string {
-    const filler =
-      fill > propr.proprName.length
-        ? ' '.repeat(fill - propr.proprName.length)
-        : ' ';
+    const filler = fill > propr.proprName.length ? " ".repeat(fill - propr.proprName.length) : " ";
 
     if (propr.sampleTypes.size === 1) {
       switch (propr.type) {
         case propertyType.otBigInt:
         case propertyType.otFloat:
         case propertyType.otInteger:
-          return 'f' + propr.proprName + filler + ':= 0';
+          return "f" + propr.proprName + filler + ":= 0";
         case propertyType.otString:
-          return 'f' + propr.proprName + filler + ":= ''";
+          return "f" + propr.proprName + filler + ":= ''";
         case propertyType.otBoolean:
-          return 'f' + propr.proprName + filler + ':= False';
+          return "f" + propr.proprName + filler + ":= False";
       }
     }
 
     if (propr.isAmiObj) {
-      return 'f' + propr.proprName + '.Clear';
+      return "f" + propr.proprName + ".Clear";
     }
 
     if (propr.isArray) {
-      return 'SetLength(' + 'f' + propr.proprName + ', 0)';
+      return "SetLength(" + "f" + propr.proprName + ", 0)";
     }
 
-    return 'f' + propr.proprName + filler + ':= NULL';
+    return "f" + propr.proprName + filler + ":= NULL";
   }
 
   /**
@@ -775,9 +762,7 @@ End;
         case propertyType.otInteger:
         case propertyType.otBigInt:
         case propertyType.otFloat:
-          return `self.f${propr.proprName} := obj.${Print2PascalSO.type2SOFct(
-            propr.type
-          )}`;
+          return `self.f${propr.proprName} := obj.${Print2PascalSO.type2SOFct(propr.type)}`;
       }
     }
 
@@ -803,7 +788,7 @@ End;
           end`;
     }
 
-    return 'self.f' + propr.proprName + ' := ObjAsVariant(obj)';
+    return "self.f" + propr.proprName + " := ObjAsVariant(obj)";
   }
 
   private proprAsSO(propr: any): string {
@@ -815,24 +800,18 @@ End;
         case propertyType.otBigInt:
         case propertyType.otFloat:
           return (
-            'o.' +
+            "o." +
             Print2PascalSO.type2SOPropr(propr.type) +
-            '[_JSON_' +
+            "[_JSON_" +
             propr.proprName +
-            '_] := f' +
+            "_] := f" +
             propr.proprName
           );
       }
     }
 
     if (propr.isAmiObj) {
-      return (
-        'o.O[_JSON_' +
-        propr.proprName +
-        '_] := f' +
-        propr.proprName +
-        '.AsSO(AllProps)'
-      );
+      return "o.O[_JSON_" + propr.proprName + "_] := f" + propr.proprName + ".AsSO(AllProps)";
     }
 
     if (propr.isArrayOfAmiObj) {
@@ -882,20 +861,20 @@ End;
    * printModel return the typescript code declaring ...
    */
   public printModel(): string {
-    let ts = 'Unit ' + this.ami.name + ';\n\n';
-    ts += 'Interface\n\n';
+    let ts = "Unit " + this.ami.name + ";\n\n";
+    ts += "Interface\n\n";
     ts +=
-      'Uses System.Classes, System.Math, System.SysUtils, System.Variants, SuperObject,rmx.GUID;\n\n';
+      "Uses System.Classes, System.Math, System.SysUtils, System.Variants, SuperObject,rmx.GUID;\n\n";
 
-    ts += 'Type\n';
+    ts += "Type\n";
     let tsIntfTmpl = Handlebars.compile(this.IntfTmplSrc, { noEscape: true });
     this.ami.childObjs.reverse().forEach((o) => {
       this.assignTemplateScope(o);
       ts += tsIntfTmpl(this.scope);
-      ts += '\n';
+      ts += "\n";
     });
 
-    ts += 'Implementation\n\n';
+    ts += "Implementation\n\n";
 
     tsIntfTmpl = Handlebars.compile(this.ImplConstDefTmplSrc, {
       noEscape: true,
@@ -903,22 +882,22 @@ End;
     this.ami.childObjs.reverse().forEach((o) => {
       this.assignTemplateScope(o);
       ts += tsIntfTmpl(this.scope);
-      ts += '\n';
+      ts += "\n";
     });
     tsIntfTmpl = Handlebars.compile(this.ImplUtilsTmplSrc, { noEscape: true });
     this.ami.childObjs.reverse().forEach((o) => {
       this.assignTemplateScope(o);
       ts += tsIntfTmpl(this.scope);
-      ts += '\n';
+      ts += "\n";
     });
     tsIntfTmpl = Handlebars.compile(this.ImplTmplSrc, { noEscape: true });
     this.ami.childObjs.reverse().forEach((o) => {
       this.assignTemplateScope(o);
       ts += tsIntfTmpl(this.scope);
-      ts += '\n';
+      ts += "\n";
     });
 
-    ts += 'end.\n';
+    ts += "end.\n";
 
     return ts;
   }

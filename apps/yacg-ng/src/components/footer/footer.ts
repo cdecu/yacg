@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, VERSION } from '@angular/core';
+import { ChangeDetectionStrategy, Component, VERSION } from "@angular/core";
 
 @Component({
-  selector: 'yacg-footer',
+  selector: "yacg-footer",
   imports: [],
-  templateUrl: './footer.html',
-  styleUrl: './footer.scss',
+  templateUrl: "./footer.html",
+  styleUrl: "./footer.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Footer {

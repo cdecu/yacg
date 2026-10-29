@@ -3,30 +3,28 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/core/src",
   "projectType": "library",
-  "release": {
-    "version": {
-      "generatorOptions": {
-        "packageRoot": "dist/{projectRoot}",
-        "currentVersionResolver": "git-tag"
-      }
-    }
-  },
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/libs/core"],
       "options": {
-        "outputPath": "dist/libs/core",
-        "tsConfig": "libs/core/tsconfig.lib.json",
-        "packageJson": "libs/core/package.json",
-        "main": "libs/core/src/index.ts",
-        "assets": ["libs/core/*.md"]
+        "command": "vp pack",
+        "cwd": "libs/core"
       }
     },
-    "nx-release-publish": {
+    "test": {
+      "executor": "nx:run-commands",
       "options": {
-        "packageRoot": "dist/{projectRoot}"
+        "command": "vp test libs/core/src/spec/printors.spec.ts libs/core/src/spec/propInfo.spec.ts",
+        "cwd": "."
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vp lint libs/core",
+        "cwd": "."
       }
     }
   }

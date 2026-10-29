@@ -1,11 +1,15 @@
 <div class="output-header">
   <select class="fmt" id="fmt" [(ngModel)]="selectedFmt">
-    <option *ngFor="let p of formats" [value]="p">
-      {{ p }}
-    </option>
+    @for (p of formats; track p) {
+    <option [value]="p">{{ p }}</option>
+    }
   </select>
 </div>
 
 <div class="output-editor">
-  <ngx-monaco-editor class="editor"  #editor [options]="OutputOptions" [ngModel]="data"></ngx-monaco-editor>
+  <ngx-monaco-editor
+    class="editor"
+    [options]="OutputOptions()"
+    [ngModel]="data"
+  ></ngx-monaco-editor>
 </div>

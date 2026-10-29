@@ -1,44 +1,36 @@
-import * as assert from 'assert';
+import * as assert from "assert";
+import { describe, expect, it, test } from "vite-plus/test";
 import {
   Print2PascalSO,
   Print2TypeScript,
   IntfModelPrintor,
   AmiModelBase,
   ConfigIntf,
-} from '../index';
+} from "../index";
 
-describe('Pascal Printor', function () {
-  it('buildPascalObjName', function () {
-    assert.strictEqual(
-      IntfModelPrintor.buildPascalObjName('test  ts  Intf'),
-      'Test_ts_Intf'
-    );
-    assert.strictEqual(
-      IntfModelPrintor.buildPascalObjName('test.ts.Intf'),
-      'Test_ts_Intf'
-    );
+describe("Pascal Printor", function () {
+  it("buildPascalObjName", function () {
+    assert.strictEqual(IntfModelPrintor.buildPascalObjName("test  ts  Intf"), "Test_ts_Intf");
+    assert.strictEqual(IntfModelPrintor.buildPascalObjName("test.ts.Intf"), "Test_ts_Intf");
   });
-  it('buildPascalObjProprName', function () {
+  it("buildPascalObjProprName", function () {
     assert.strictEqual(
-      IntfModelPrintor.buildPascalObjProprName('test  ts  Propr'),
-      'test_ts_Propr'
+      IntfModelPrintor.buildPascalObjProprName("test  ts  Propr"),
+      "test_ts_Propr",
     );
-    assert.strictEqual(
-      IntfModelPrintor.buildPascalObjProprName('test.ts.Propr'),
-      'test_ts_Propr'
-    );
+    assert.strictEqual(IntfModelPrintor.buildPascalObjProprName("test.ts.Propr"), "test_ts_Propr");
   });
 });
 
-test('TSPrintor', () => {
+test("TSPrintor", () => {
   class TestTSPrintorAmiModel extends AmiModelBase {
     ami: unknown;
   }
 
   const ami: TestTSPrintorAmiModel = {
     ami: {},
-    name: 'test',
-    description: 'test',
+    name: "test",
+    description: "test",
     sampleSize: 0,
     addExamples: true,
     config: {} as ConfigIntf,
@@ -46,7 +38,7 @@ test('TSPrintor', () => {
   };
 
   const config: ConfigIntf = {
-    outputFmt: 'typescript',
+    outputFmt: "typescript",
     dico: {},
   };
 
@@ -54,18 +46,18 @@ test('TSPrintor', () => {
   // Load some data from TestData
 
   const p = new Print2TypeScript(ami, config);
-  assert.strictEqual(p.printModel(), '');
+  assert.strictEqual(p.printModel(), "");
 });
 
-test('PascalPrintor', () => {
+test("PascalPrintor", () => {
   class TestPascalPrintorAmiModel extends AmiModelBase {
     ami: unknown;
   }
 
   const ami: TestPascalPrintorAmiModel = {
     ami: {},
-    name: 'test',
-    description: 'test',
+    name: "test",
+    description: "test",
     sampleSize: 0,
     addExamples: true,
     config: {} as ConfigIntf,
@@ -73,7 +65,7 @@ test('PascalPrintor', () => {
   };
 
   const config: ConfigIntf = {
-    outputFmt: 'typescript',
+    outputFmt: "typescript",
     dico: {},
   };
 
@@ -81,5 +73,5 @@ test('PascalPrintor', () => {
   // Load some data from TestData
 
   const p = new Print2PascalSO(ami, config);
-  expect(p.printModel().startsWith('Unit')).toBe(true);
+  expect(p.printModel().startsWith("Unit")).toBe(true);
 });

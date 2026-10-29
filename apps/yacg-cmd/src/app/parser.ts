@@ -1,5 +1,14 @@
 import * as YAML from "yaml";
-import { AmiModel, ConfigIntf, InputFileIntf, intfModelPrintor, logHelper, Print2PascalRecord, Print2PascalSO, Print2TypeScript } from "@yacg/core";
+import {
+  AmiModel,
+  ConfigIntf,
+  InputFileIntf,
+  intfModelPrintor,
+  logHelper,
+  Print2PascalRecord,
+  Print2PascalSO,
+  Print2TypeScript,
+} from "@yacg/core";
 
 /**
  * Parse a YAML,JSON string into a AMI
@@ -9,7 +18,10 @@ export class Parser {
   private trg?: string;
   private ami: AmiModel;
 
-  constructor(private config: ConfigIntf, private cliLogger: logHelper) {}
+  constructor(
+    private config: ConfigIntf,
+    private cliLogger: logHelper,
+  ) {}
 
   /**
    * Parse a YAML,JSON string into a AMI

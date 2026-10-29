@@ -6,35 +6,26 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@nx/esbuild:esbuild",
-      "outputs": ["{options.outputPath}"],
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/apps/yacg-cmd"],
       "defaultConfiguration": "production",
       "options": {
-        "platform": "node",
-        "outputPath": "dist/apps/yacg-cmd",
-        "format": ["cjs"],
-        "bundle": false,
-        "main": "apps/yacg-cmd/src/main.ts",
-        "tsConfig": "apps/yacg-cmd/tsconfig.app.json",
-        "assets": ["apps/yacg-cmd/src/assets"],
-        "generatePackageJson": true,
-        "esbuildOptions": {
-          "sourcemap": true,
-          "outExtension": {
-            ".js": ".js"
-          }
-        }
-      },
-      "configurations": {
-        "development": {},
-        "production": {
-          "esbuildOptions": {
-            "sourcemap": false,
-            "outExtension": {
-              ".js": ".js"
-            }
-          }
-        }
+        "command": "vp pack",
+        "cwd": "apps/yacg-cmd"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vp test apps/yacg-cmd/src/spec/config.spec.ts",
+        "cwd": "."
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vp lint apps/yacg-cmd",
+        "cwd": "."
       }
     },
     "serve": {
@@ -44,14 +35,6 @@
       "options": {
         "buildTarget": "yacg-cmd:build",
         "runBuildTargetDependencies": false
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "yacg-cmd:build:development"
-        },
-        "production": {
-          "buildTarget": "yacg-cmd:build:production"
-        }
       }
     }
   }

@@ -1,4 +1,4 @@
-import * as yargs from "yargs";
+import yargs from "yargs";
 import { cosmiconfigSync } from "cosmiconfig";
 import { ConfigDicoIntf, ConfigIntf, InputFileIntf, LogLevel } from "@yacg/core";
 
@@ -21,7 +21,8 @@ export class Config implements ConfigIntf {
     // load config file
     const configFile = argv["configFile"];
     const explorer = cosmiconfigSync("yacg");
-    const { config, filepath } = (typeof configFile === "string" ? explorer.load(configFile) : explorer.search()) || {};
+    const { config, filepath } =
+      (typeof configFile === "string" ? explorer.load(configFile) : explorer.search()) || {};
     // merge config file and argv
     this.config = { ...config, ...argv };
     this.config.configFile = configFile || filepath;
@@ -74,9 +75,10 @@ export class Config implements ConfigIntf {
   }
 
   private static yargs() {
-    const cmdline = yargs
+    const yargsInstance = yargs();
+    const cmdline = yargsInstance
       .env("YACG")
-      .wrap(yargs.terminalWidth())
+      .wrap(yargsInstance.terminalWidth())
       .scriptName("yacg-cmd")
       .usage("$0 <cmd> [args]")
       .version()

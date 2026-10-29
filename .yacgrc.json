@@ -1,10 +1,6 @@
 {
-  "test": "toto",
-  "albert": "son pere",
   "logLevel": 9,
-  "outputFmt": [
-    "so","pascal","typescript"
-  ],
+  "outputFmt": ["so", "pascal", "typescript"],
   "intfDescr": "Intf Descr",
   "files": [
     {
@@ -84,9 +80,6 @@
     },
     "rescue_printer_id": {
       "defaultType": "integer"
-    },
-    "uid": {
-      "defaultType": "string"
     }
   }
 }

@@ -1,21 +1,21 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { EditorComponent } from 'ngx-monaco-editor-v2';
-import { FormsModule } from '@angular/forms';
-import { ParserService } from '../../app/parser.service';
+import { ChangeDetectionStrategy, Component } from "@angular/core";
+import { EditorComponent } from "ngx-monaco-editor-v2";
+import { FormsModule } from "@angular/forms";
+import { ParserService } from "../../app/parser.service";
 
 @Component({
-  selector: 'yacg-input',
+  selector: "yacg-input",
   imports: [EditorComponent, FormsModule],
-  templateUrl: './input.html',
-  styleUrl: './input.scss',
+  templateUrl: "./input.html",
+  styleUrl: "./input.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Input {
   constructor(public readonly parser: ParserService) {}
 
   public readonly InputOptions = {
-    language: 'json',
-    theme: 'vs-dark',
+    language: "json",
+    theme: "vs-dark",
     minimap: {
       enabled: false,
     },

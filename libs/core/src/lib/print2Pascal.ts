@@ -1,16 +1,13 @@
-import * as Handlebars from 'handlebars';
-import { IntfModelPrintor, intfModelPrintor } from './intfPrintor';
-import { ConfigIntf } from './amiConfig';
-import { AmiModel } from './amiModel';
-import { AmiObj } from './amiObj';
+import * as Handlebars from "handlebars";
+import { IntfModelPrintor, intfModelPrintor } from "./intfPrintor";
+import { ConfigIntf } from "./amiConfig";
+import { AmiModel } from "./amiModel";
+import { AmiObj } from "./amiObj";
 
 /**
  * Print to Pascal Record.
  */
-export class Print2PascalRecord
-  extends IntfModelPrintor
-  implements intfModelPrintor
-{
+export class Print2PascalRecord extends IntfModelPrintor implements intfModelPrintor {
   //region properties
   /**
    * Typescript Interface
@@ -48,23 +45,22 @@ type
    */
   //endregion
 
-  constructor(public readonly a: AmiModel, public readonly c?: ConfigIntf) {
+  constructor(
+    public readonly a: AmiModel,
+    public readonly c?: ConfigIntf,
+  ) {
     super(a, c || a.config);
-    this.fileExt = '.popo.pas';
-    this.outputFmt = 'pascal';
+    this.fileExt = ".popo.pas";
+    this.outputFmt = "pascal";
     // add custom helpers to Handlebars
-    Handlebars.registerHelper(
-      'DelphiDescr',
-      (indent: number, val1: string, val2: string) =>
-        Print2PascalRecord.DelphiDescr(indent, val1, val2)
+    Handlebars.registerHelper("DelphiDescr", (indent: number, val1: string, val2: string) =>
+      Print2PascalRecord.DelphiDescr(indent, val1, val2),
     );
-    Handlebars.registerHelper('Indent', (indent: number) => ' '.repeat(indent));
-    Handlebars.registerHelper('Fill', (val: string, indent: number) =>
-      indent > val.length ? val + ' '.repeat(indent - val.length) : val
+    Handlebars.registerHelper("Indent", (indent: number) => " ".repeat(indent));
+    Handlebars.registerHelper("Fill", (val: string, indent: number) =>
+      indent > val.length ? val + " ".repeat(indent - val.length) : val,
     );
-    Handlebars.registerHelper('json', (context) =>
-      JSON.stringify(context, null, 2)
-    );
+    Handlebars.registerHelper("json", (context) => JSON.stringify(context, null, 2));
     this.pascalTmpl = Handlebars.compile(this.pascalTmplSrc, {
       noEscape: true,
     });
@@ -88,10 +84,10 @@ type
    * printModel return the typescript code declaring ...
    */
   public printModel(): string {
-    let ts = '';
+    let ts = "";
     this.ami.childObjs.reverse().forEach((o) => {
       this.assignTemplateScope(o);
-      ts = ts + this.pascalTmpl(this.scope) + '\n';
+      ts = ts + this.pascalTmpl(this.scope) + "\n";
     });
     return ts;
   }

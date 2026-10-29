@@ -1,28 +1,25 @@
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
-import { ParserService } from '../../app/parser.service';
-import { EditorComponent } from 'ngx-monaco-editor-v2';
-import { FormsModule } from '@angular/forms';
-import { NgForOf } from '@angular/common';
+import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
+import { ParserService } from "../../app/parser.service";
+import { EditorComponent } from "ngx-monaco-editor-v2";
+import { FormsModule } from "@angular/forms";
 
 @Component({
-  selector: 'yacg-output',
-  imports: [EditorComponent, FormsModule, NgForOf],
-  templateUrl: './output.html',
-  styleUrl: './output.scss',
+  selector: "yacg-output",
+  imports: [EditorComponent, FormsModule],
+  templateUrl: "./output.html",
+  styleUrl: "./output.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Output {
-  @ViewChild('editor') editor: any;
+  public readonly formats = ["typescript", "pascal", "superobject"];
 
-  public readonly formats = ['typescript', 'pascal', 'superobject'];
-
-  public readonly OutputOptions = {
+  public readonly OutputOptions = signal({
     readOnly: true,
-    language: 'typescript',
+    language: "typescript",
     minimap: {
       enabled: false,
     },
-  };
+  });
 
   constructor(public readonly parser: ParserService) {}
 
@@ -42,15 +39,7 @@ export class Output {
   }
 
   private initEditorOptions(value: string) {
-    switch (value) {
-      case 'pascal':
-      case 'superobject':
-        this.OutputOptions.language = 'pascal';
-        break;
-      default:
-        this.OutputOptions.language = value;
-        break;
-    }
-    this.editor.options = this.OutputOptions;
+    const language = value === "pascal" || value === "superobject" ? "pascal" : value;
+    this.OutputOptions.update((options) => ({ ...options, language }));
   }
 }

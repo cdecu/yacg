@@ -5,11 +5,11 @@
     min-height: 66vh;
     display: grid;
     grid-template-areas:
-      'input'
-      'output';
+      "input"
+      "output";
     grid-template-columns: auto;
-    @screen sm {
-      grid-template-areas: 'input output';
+    @media (width >= 40rem) {
+      grid-template-areas: "input output";
       grid-template-columns: 1fr 1fr;
     }
 

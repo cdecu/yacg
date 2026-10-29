@@ -1,11 +1,12 @@
-import { Config } from '../app/config';
-import * as assert from 'node:assert';
+import { Config } from "../app/config";
+import * as assert from "node:assert";
+import { describe, it } from "vite-plus/test";
 
-describe('valType', function () {
+describe("valType", function () {
   const config = new Config();
 
-  it('should return `objectTypes` for valid Value|JSON', function () {
+  it("should return `objectTypes` for valid Value|JSON", function () {
     // TODO Add some test
-    assert.notStrictEqual(config.outputFmt, '');
+    assert.notStrictEqual(config.outputFmt, "");
   });
 });

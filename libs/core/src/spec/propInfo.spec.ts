@@ -1,4 +1,5 @@
 import assert = require("assert");
+import { describe, it } from "vite-plus/test";
 import { isJson, valType, propertyType } from "../lib/amiUtils";
 
 describe("valType", function () {
