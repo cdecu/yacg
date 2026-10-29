@@ -1,6 +1,6 @@
-import { ApplicationConfig, provideZonelessChangeDetection } from "@angular/core";
+import { ApplicationConfig } from "@angular/core";
 import { provideMonacoEditor } from "ngx-monaco-editor-v2";
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZonelessChangeDetection(), provideMonacoEditor()],
+  providers: [provideMonacoEditor()],
 };

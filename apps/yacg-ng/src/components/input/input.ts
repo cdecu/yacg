@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject } from "@angular/core";
 import { EditorComponent } from "ngx-monaco-editor-v2";
 import { FormsModule } from "@angular/forms";
 import { ParserService } from "../../app/parser.service";
@@ -11,7 +11,7 @@ import { ParserService } from "../../app/parser.service";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Input {
-  constructor(public readonly parser: ParserService) {}
+  private readonly parser = inject(ParserService);
 
   public readonly InputOptions = {
     language: "json",

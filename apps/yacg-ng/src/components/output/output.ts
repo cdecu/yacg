@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
 import { ParserService } from "../../app/parser.service";
 import { EditorComponent } from "ngx-monaco-editor-v2";
 import { FormsModule } from "@angular/forms";
@@ -11,6 +11,8 @@ import { FormsModule } from "@angular/forms";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Output {
+  private readonly parser = inject(ParserService);
+
   public readonly formats = ["typescript", "pascal", "superobject"];
 
   public readonly OutputOptions = signal({
@@ -20,8 +22,6 @@ export class Output {
       enabled: false,
     },
   });
-
-  constructor(public readonly parser: ParserService) {}
 
   public get selectedFmt(): string {
     return this.parser.selectedFmt();

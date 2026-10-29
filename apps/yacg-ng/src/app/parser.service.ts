@@ -1,4 +1,4 @@
-import { computed, effect, Injectable, signal } from "@angular/core";
+import { effect, Injectable, signal } from "@angular/core";
 import {
   AmiModel,
   InputFileIntf,
@@ -40,23 +40,16 @@ export class ParserService {
     }),
   );
 
-  public data = computed(() => {
-    return this.output_data();
-  });
-
   constructor() {
     // TODO load dico from assets file or ...
     this.ami = new AmiModel({ dico: {}, outputFmt: "typescript" });
 
     // watch for changes in selected format
-    effect(
-      () => {
-        // console.log(`The fmt is: ${this.selectedFmt()}`);
-        const d = this.parse(this.$input_data.value);
-        this.output_data.set(d);
-      },
-      { allowSignalWrites: true },
-    );
+    effect(() => {
+      // console.log(`The fmt is: ${this.selectedFmt()}`);
+      const d = this.parse(this.$input_data.value);
+      this.output_data.set(d);
+    });
 
     // subscribe
     this.$output_data.subscribe(() => {

@@ -5,7 +5,6 @@ import { NgOptimizedImage } from "@angular/common";
   selector: "yacg-resources",
   imports: [NgOptimizedImage],
   templateUrl: "./resources.html",
-  styleUrl: "./resources.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Resources {}

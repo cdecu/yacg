@@ -1,12 +1,16 @@
-<div class="output-header">
-  <select class="fmt" id="fmt" [(ngModel)]="selectedFmt">
+<div class="output-header h-6">
+  <select
+    class="border-0 bg-white text-accent focus:outline-none dark:bg-black"
+    id="fmt"
+    [(ngModel)]="selectedFmt"
+  >
     @for (p of formats; track p) {
     <option [value]="p">{{ p }}</option>
     }
   </select>
 </div>
 
-<div class="output-editor">
+<div class="output-editor flex-1">
   <ngx-monaco-editor
     class="editor"
     [options]="OutputOptions()"

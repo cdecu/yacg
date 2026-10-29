@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from "@angular/core";
+import { Component } from "@angular/core";
 import { Header } from "../components/header/header";
 import { Input } from "../components/input/input";
 import { Output } from "../components/output/output";
@@ -9,7 +9,5 @@ import { Footer } from "../components/footer/footer";
   imports: [Header, Input, Output, Resources, Footer],
   selector: "app-root",
   templateUrl: "./app.component.html",
-  changeDetection: ChangeDetectionStrategy.Eager,
-  styleUrl: "./app.component.css",
 })
 export class AppComponent {}

@@ -6,7 +6,6 @@ import { NgOptimizedImage } from "@angular/common";
   selector: "yacg-header",
   imports: [MdoButtonModule, NgOptimizedImage],
   templateUrl: "./header.html",
-  styleUrl: "./header.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Header {}
