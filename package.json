@@ -7,8 +7,7 @@
     "cmd": "nx build yacg-cmd && node dist/apps/yacg-cmd/main.js",
     "fmt": "vp fmt",
     "lint": "vp lint",
-    "test": "vp test",
-    "gh-pages": "./gh-pages-publish"
+    "test": "vp test"
   },
   "dependencies": {
     "@angular/common": "~22.2.0",
